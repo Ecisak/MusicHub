@@ -2,8 +2,9 @@
 session_start(); // session pro CSRF a chyby
 
 require_once __DIR__ . '/../controllers/RegistrationController.php';
-// require_once __DIR__ . '/../controllers/LoginController.php'; // až budeš mít login
+require_once __DIR__ . '/../controllers/LoginController.php';
 require_once __DIR__ . '/../controllers/ValidationController.php';
+require_once __DIR__ . '/../controllers/LogoutController.php';
 // jednoduchý router podle GET parametru "page"
 $page = $_GET['page'] ?? 'home';
 
@@ -21,8 +22,17 @@ switch ($page) {
         $controller->validate();
         break;
     case 'login':
-        // $controller = new LoginController();
-        // podobně jako u registrace
+        $controller = new LoginController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller-> login();
+        } else {
+            $controller->showForm();
+        }
+        break;
+    case 'logout':
+        require_once __DIR__ . '/../controllers/LogoutController.php';
+        $controller = new LogoutController();
+        $controller->logout();
         break;
 
     default:
@@ -30,4 +40,3 @@ switch ($page) {
         break;
 }
 
-//TODO OPRAVIT VALIDATOR

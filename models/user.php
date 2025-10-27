@@ -29,4 +29,10 @@ class User {
             'p' => $hash
         ]);
     }
+    public function findByEMail(string $email): ?array {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt->execute(['email' => $email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ?: null;
+    }
 }

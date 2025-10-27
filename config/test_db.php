@@ -7,7 +7,7 @@ try {
 
     // Ověříme, že spojení funguje
     if ($conn instanceof PDO) {
-        echo "Spojení s databází bylo úspěšné! ✅\n";
+        echo "Spojení s databází bylo úspěšné\n";
     }
 
     // Zkusíme jednoduchý dotaz
@@ -17,6 +17,6 @@ try {
     echo "Tabulky v databázi:\n";
     print_r($tables);
 
-} catch (Exception $e) {
-    echo "Chyba při testu databáze: " . $e->getMessage();
+} catch (PDOException $e) {
+    throw new RuntimeException("Database connection failed: " . $e->getMessage());
 }

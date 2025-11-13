@@ -1,0 +1,54 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+
+
+<div class="container">
+    <!-- Login Form -->
+    <h1 class="reg-header">Přihlášení</h1>
+    <form class="login-form needs-validation" novalidate method="post" action="/MusicHub/public/index.php?page=login">
+        <!-- CSRF Token for security -->
+        <input type="hidden" name="csrf" value="{{ csrf_token }}">
+
+        <!-- Email Input Field -->
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="InputEmail" name="email" placeholder="pepazdepa@seznam.cz" required>
+            <label for="InputEmail">Email address</label>
+            <div class="invalid-feedback">Zadej platný e-mail.</div>
+            <div class="valid-feedback">Email je v pořádku</div>
+        </div>
+
+        <!-- Email Help Text -->
+        <div id="emailHelp" class="form-text mb-3">
+            We'll never share your email with anyone else.
+        </div>
+
+        <!-- Password Input Field -->
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="InputPassword" name="password" placeholder="heslo" required>
+            <label for="InputPassword">Heslo</label>
+            <div class="invalid-feedback">Zadej heslo.</div>
+            <div class="valid-feedback">Heslo je v pořádku</div>
+        </div>
+
+        <!-- Password Help Block -->
+        <div id="passwordHelpBlock" class="form-text mb-3"></div>
+
+
+        <!-- Link to Registration Page -->
+        <button type="submit" class="btn btn-primary my-btn w-100">Přihlásit se</button>
+        <p class="reg-txt mt-3">Nejsi registrován? Klikni <a href="/MusicHub/public/index.php?page=register">zde</a></p>
+        <!-- Submit Button -->
+        {%if errors %}
+        <div class="alert alert-danger mx-3">
+            <ul class="mb-0"></ul>
+            {% for error in errors %}
+                <li>{{error}}</li>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+

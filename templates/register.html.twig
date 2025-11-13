@@ -1,0 +1,109 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="reg-header">Registrace</h1>
+
+        <!-- Registration Form -->
+        <form class="registration-form needs-validation" novalidate method="post" action="/MusicHub/public/index.php?page=register">
+            <!-- CSRF Token for security -->
+
+            <input type="hidden" name="csrf" value="{{ csrf_token }}">
+
+            <!-- Email Input Field -->
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="InputEmail" name="email" placeholder="pepazdepa@seznam.cz" required>
+                <label for="InputEmail">Email address</label>
+                <div class="invalid-feedback">Zadej platný e-mail.</div>
+                <div class="valid-feedback">Email je v pořádku</div>
+            </div>
+
+            <!-- Email Help Text -->
+            <div id="emailHelp" class="form-text mb-3">
+                We'll never share your email with anyone else.
+            </div>
+
+            <!-- Username Input Field -->
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="InputUsername" name="username" placeholder="pepa123" required>
+                <label for="InputUsername">Přihlašovací jméno</label>
+                <div class="invalid-feedback">Zadej přihlašovací jméno.</div>
+                <div class="valid-feedback">Jméno je v pořádku</div>
+            </div>
+
+            <!-- Password Input Field -->
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="InputPassword" name="password" placeholder="heslo" required>
+                <label for="InputPassword">Heslo</label>
+                <div class="invalid-feedback"></div>
+                <div class="valid-feedback">Heslo je dostatečně silné</div>
+            </div>
+
+            <!-- Password Confirmation Field -->
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="InputPasswordConfirm" name="password_confirm" placeholder="heslo znovu" required>
+                <label for="InputPasswordConfirm">Potvrzení hesla</label>
+                <div class="invalid-feedback"></div>
+                <div class="valid-feedback">Hesla se shodují</div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary my-btn w-100">Registrovat</button>
+
+            <!-- Link to Login Page -->
+            <p class="reg-txt mt-3">Již registrován? Klikni <a href="/MusicHub/public/index.php?page=login">zde</a></p>
+{% if errors %}
+    <div class="alert alert-danger mt-3"><ul class="mb-0">
+    {% for error in errors %}
+        <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+    </div>
+    {% endif %}
+        </form>
+    <script>
+        function validateInput(inputElement, fieldName, extraData = {}) {
+            let debounceTimer;
+            inputElement.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function() {
+                    const formData = new FormData();
+                    formData.append('field', fieldName)
+                    formData.append('value', inputElement.value)
+                    if (extraData.passwordElement) {
+                        const passwordValue = extraData.passwordElement.value;
+                        formData.append('password', passwordValue);
+                    }
+                    fetch('/MusicHub/public/index.php?page=validate', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            const invalidFeedback = inputElement.parentElement.querySelector('.invalid-feedback');
+                            if (data.valid) {
+                                inputElement.classList.remove('is-invalid');
+                                inputElement.classList.add('is-valid');
+                                invalidFeedback.innerHTML = '';
+                            } else {
+                                inputElement.classList.remove('is-valid');
+                                inputElement.classList.add('is-invalid');
+                                invalidFeedback.innerHTML = data.message;
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                }, 300);
+
+            })
+        }
+       const emailInput = document.getElementById('InputEmail');
+       validateInput(emailInput, 'email');
+        const usernameInput = document.getElementById('InputUsername');
+        validateInput(usernameInput, 'username');
+       const passwordInput = document.getElementById('InputPassword')
+       validateInput(passwordInput, 'password');
+        const passwordConfirmInput = document.getElementById('InputPasswordConfirm');
+        validateInput(passwordConfirmInput, 'password_confirm', {passwordElement: passwordInput})
+    </script>
+    </div>
+{% endblock %}

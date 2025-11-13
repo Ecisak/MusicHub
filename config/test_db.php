@@ -20,3 +20,4 @@ try {
 } catch (PDOException $e) {
     throw new RuntimeException("Database connection failed: " . $e->getMessage());
 }
+

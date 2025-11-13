@@ -1,51 +1,99 @@
+
 <?php
+/**
+ * Registration Controller
+ * Handles user registration logic
+ */
 
-
-session_start();
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/user.php';
 
-class RegistrationController {
-
-    public function showForm() {
-        // CSRF token
+class RegistrationController
+{
+    /**
+     * Display the registration form
+     */
+    public function showForm($twig): void
+    {
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
-        require __DIR__ . '/../views/register.php';
+        echo $twig->render('register.html.twig', [
+            'csrf_token' => $_SESSION['csrf_token'] ?? '',
+            'errors' => $_SESSION['errors'] ?? [],
+        ]);
+        unset($_SESSION['errors']);
+        // Generate CSRF token if not already set
+
     }
 
-    public function register() {
+    /**
+     * Process user registration
+     */
+    public function register(): void
+    {
+        // Only process POST requests
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->showForm();
-            return;
+            header("Location: /MusicHub/public/index.php?page=register");
+            exit;
+
         }
+
         $errors = [];
         $user = new User(Database::getInstance());
+
+        // Sanitize input data
         $username = trim($_POST['username'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         $password_confirm = $_POST['password_confirm'] ?? '';
 
-        // CSRF
+        // Validate CSRF token
         if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf'] ?? '')) {
             $errors[] = "CSRF token error";
         }
 
-        // validation
-        if ($password !== $password_confirm) $errors[] = "passwords do not match";
-        if (strlen($password) < 8) $errors[] = "password must be at least 8 characters";
-        if (!preg_match('/\d/', $password)) $errors[] ="password must contain a number";
-        if (!preg_match('/[A-Z]/', $password)) $errors[] ="password must contain an uppercase letter";
-        if ($user->exists($email)) $errors[] = "user with this email already exists";
+        // Validate password requirements
+        if ($password !== $password_confirm) {
+            $errors[] = "Passwords do not match";
+        }
+        if (strlen($password) < 8) {
+            $errors[] = "Password must be at least 8 characters";
+        }
+        if (!preg_match('/\d/', $password)) {
+            $errors[] = "Password must contain a number";
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors[] = "Password must contain an uppercase letter";
+        }
+        if (empty($username)) {
+            $errors[] = "Username is required";
+        }
+        if (empty($email)) {
+            $errors[] = "Email is required";
+        }
+        if (empty($password)) {
+            $errors[] = "Password is required";
+        }
+        if (empty($password_confirm)) {
+            $errors[] = "Password confirmation is required";
+        }
+
+        // Check if user already exists
+        if ($user->exists($email)) {
+            $errors[] = "User with this email already exists";
+        }
+
+        // If there are validation errors, redirect back to form
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             header("Location: /MusicHub/public/index.php?page=register");
             exit;
         }
+
+        // Create new user and redirect to login
         $user->create($username, $email, $password);
         header("Location: /MusicHub/public/index.php?page=login");
         exit;
     }
-
 }

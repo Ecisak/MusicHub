@@ -68,6 +68,7 @@ switch ($page) {
         } else {
             $controller->showForm($twig);
         }
+        break;
     case 'home':
     default:
         // Display home page

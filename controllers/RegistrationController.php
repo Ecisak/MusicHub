@@ -91,7 +91,7 @@ class RegistrationController
             exit;
         }
 
-        // Create new user and redirect to login
+        // Create new user and redirect to log in
         $user->create($username, $email, $password);
         header("Location: /MusicHub/public/index.php?page=login");
         exit;

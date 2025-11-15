@@ -13,14 +13,28 @@
             </div>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control" id="inputArtist" name="artist" required>
-                <label for="inputArtist">Autor</label>
+                <label for="inputArtist">Interpret</label>
 
+            </div>
+
+            <div class="col-form-label">
+                <label for="genreSelect" class="form-label">Žánr</label>
+                <select class="form-select" id="genreSelect" name="genre-id">
+                    {% for genre in genres %}
+                    <option value="{{ genre.id }}" >{{ genre.genre }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-floating mb-3">
                 <input type="file" class="form-control" id="coverImage" name="coverImage" required>
                 <label for="coverImage">Obal alba</label>
             </div>
+            <div class="form-floating mb-3">
+                <input type="file" class="form-control" id="musicUpload" name="musicUpload" required>
+                <label for="musicUpload">Zvuková stopa</label>
+            </div>
+            <button type="submit" class="btn btn-primary my-btn w-100">Odeslat</button>
         </form>
     </div>
-
+// TODO: add release year
 {% endblock %}

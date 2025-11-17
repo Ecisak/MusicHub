@@ -25,6 +25,10 @@
                     {% endfor %}
                 </select>
             </div>
+            <div class="col-form-label">
+                <label for="year" class="form-label">Rok vydání</label>
+                <input type="number" class="form-control" id="year" name="release-year" required>
+            </div>
             <div class="form-floating mb-3">
                 <input type="file" class="form-control" id="coverImage" name="coverImage" required>
                 <label for="coverImage">Obal alba</label>
@@ -36,5 +40,4 @@
             <button type="submit" class="btn btn-primary my-btn w-100">Odeslat</button>
         </form>
     </div>
-// TODO: add release year
 {% endblock %}

@@ -3,10 +3,14 @@
  * Main Entry Point - Front Controller
  * Handles routing for the MusicHub application
  */
+
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-// Start session for CSRF protection and error handling
+// Starts a session for CSRF protection and error handling
 session_start();
 
 // Load required controllers
@@ -19,13 +23,19 @@ require_once __DIR__ . '/../controllers/AddMusicController.php';
 
 // Get the requested page from GET parameter, default to 'home'
 $page = $_GET['page'] ?? 'home';
-$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
-$twig = new \Twig\Environment($loader, [
+$loader = new FilesystemLoader(__DIR__ . '/../templates');
+$twig = new Environment($loader, [
     'cache' => false
 ]);
 $twig->addGlobal('isLoggedIn', isset($_SESSION['user_id']));
 $twig->addGlobal('username', $_SESSION['username'] ?? '');
+$flashMessage = '';
+if (isset($_SESSION['flash-message'])) {
+    $flashMessage = $_SESSION['flash-message'];
+}
+unset($_SESSION['flash-message']);
 
+$twig->addGlobal('flashMessage', $flashMessage);
 // Route requests to appropriate controllers
 switch ($page) {
     case 'register':
@@ -48,7 +58,7 @@ switch ($page) {
     case 'login':
         $controller = new LoginController();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // POST request - process login
+            // POST-request - process login
             $controller->login();
         } else {
             // GET request - display login form
@@ -62,13 +72,24 @@ switch ($page) {
         break;
 
     case 'add':
-        $controller = new AddMusicController();
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $controller->addMusic();
-        } else {
-            $controller->showForm($twig);
+        if ($isLoggedIn = isset($_SESSION['user_id'])) {
+            $controller = new AddMusicController();
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->addMusic();
+            } else {
+                $controller->showForm($twig);
+            }
+
+        }else {
+            if (headers_sent($file, $line)) {
+                die('Headers already sent in '.$file.' on line '.$line);
+            }
+            $_SESSION['flash-message'] = "k přidání hudby se musíte přihlásit";
+            header('Location: /MusicHub/public/index.php?page=login');
+            exit;
         }
         break;
+
     case 'home':
     default:
         // Display home page

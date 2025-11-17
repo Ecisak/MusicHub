@@ -45,16 +45,16 @@ class AddMusicController {
         }
         $newImageName = null;
         $imagePath = null;
-        if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] === UPLOAD_ERR_OK) {
-            $cover_image = $_FILES['cover_image'];
-            $uploadedExtension = strtolower(pathinfo($cover_image['name'], PATHINFO_EXTENSION));
+        if (isset($_FILES['coverImage']) && $_FILES['coverImage']['error'] === UPLOAD_ERR_OK) {
+            $coverImage = $_FILES['coverImage'];
+            $uploadedExtension = strtolower(pathinfo($coverImage['name'], PATHINFO_EXTENSION));
             $newImageName = uniqid('cover_', true) . '.' . $uploadedExtension;
-            $imagePath = __DIR__ . '/../public/images/covers/' . $newImageName;
-            if ($cover_image['size'] >= maxUploadSize) {
-                $errors['cover_image'] = "Příliš velký soubor, max je 25MB";
+            $imagePath = __DIR__ . '/../public/uploads/covers/' . $newImageName;
+            if ($coverImage['size'] >= maxUploadSize) {
+                $errors['coverImage'] = "Příliš velký soubor, max je 25MB";
             }
             if (!in_array($uploadedExtension, $allowedExtensionsCover)) {
-                $errors['cover_image'] = "soubor ma nepovolený typ:". $uploadedExtension .". povolene jsou jpg, jpeg, png a webp.";
+                $errors['coverImage'] = "soubor ma nepovolený typ:". $uploadedExtension .". povolene jsou jpg, jpeg, png a webp.";
             }
 
         }
@@ -75,37 +75,42 @@ class AddMusicController {
         }
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
+            //var_dump($_SESSION['errors']);
             header("Location: /MusicHub/public/index.php?page=add");
             exit;
         } else {
-            // VŠE JE OK, Jdeme přesouvat a ukládat
 
-            if (move_uploaded_file($_FILES['cover_image']['tmp_name'], $imagePath) && move_uploaded_file($_FILES['musicUpload']['tmp_name'], $musicPath)) {
-                // ÚSPĚCH! Soubory jsou na místě.
-                // Zde přijde kód pro uložení do DB
-                // Vytvoříme pole $songData s $title, $artist, $newImageName, $newMusicName atd.
-                // $musicModel = new Music(Database::getInstance());
-                // $musicModel->create($songData);
+            if (move_uploaded_file($_FILES['coverImage']['tmp_name'], $imagePath) && move_uploaded_file($_FILES['musicUpload']['tmp_name'], $musicPath)) {
                 $songData = [
                     'author' => $artist,
-                    'cover_image' => $newImageName,
+                    'coverImage' => $newImageName,
                     'filename' => $newMusicName,
                     'id_genre' => $genre_id,
                     'id_user'=> $_SESSION['user_id'],
                     'release_year' => $release_year,
                     'status' => 'pending',
                     'title' => $title,
-                    'uploaded_at' => date("Y-m-d H:i:s")
+                    'uploaded_at' => date("Y-m-d H:i:s"
+                    )
                 ];
-                // A přesměrujeme
-                $music = new Music(Database::getInstance());
-                $music->create($songData);
+                try {
+                    $music = new Music(Database::getInstance());
+                    $music->create($songData);
+                } catch (PDOException $e) {
+                    unlink($imagePath);
+                    unlink($musicPath);
+                    $_SESSION['errors']['general'] = "Chyba komunikace s databází. Nahlašte tuto chybu správci.";
+                    error_log("[FATAL] ". $e->getMessage() . "\n", 3, __DIR__ . '/../logs/music_log.log');
+                    header("Location: /MusicHub/public/index.php?page=home&status=upload_failure");
+                    exit;
+                }
                 header("Location: /MusicHub/public/index.php?page=home&status=upload_success");
                 exit;
             } else {
                 unlink($imagePath);
                 unlink($musicPath);
                 $_SESSION['errors']['general'] = "Chyba serveru při přesouvání souborů.";
+                //var_dump($_SESSION['errors']);
                 header("Location: /MusicHub/public/index.php?page=add");
                 exit;
             }

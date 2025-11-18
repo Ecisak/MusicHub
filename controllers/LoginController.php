@@ -66,6 +66,7 @@ class LoginController
                 // Set session variables for logged-in user
                 $_SESSION['user_id'] = $user['id_user'];
                 $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role'];
 
                 // Redirect to home page
                 header("Location: /MusicHub/public/index.php?page=home");

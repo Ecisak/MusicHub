@@ -20,6 +20,7 @@ require_once __DIR__ . '/../controllers/LoginController.php';
 require_once __DIR__ . '/../controllers/ValidationController.php';
 require_once __DIR__ . '/../controllers/LogoutController.php';
 require_once __DIR__ . '/../controllers/AddMusicController.php';
+require_once __DIR__ . '/../controllers/ReviewController.php';
 
 // Get the requested page from GET parameter, default to 'home'
 $page = $_GET['page'] ?? 'home';
@@ -86,6 +87,17 @@ switch ($page) {
             }
             $_SESSION['flash-message'] = "k přidání hudby se musíte přihlásit";
             header('Location: /MusicHub/public/index.php?page=login');
+            exit;
+        }
+        break;
+    case 'review':
+        if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'reviewer'){
+            $controller = new ReviewController();
+            $controller->showValidationTask($twig);
+
+        } else {
+            $_SESSION['flash-message'] = 'na tuto stranku nemate pristup';
+            header('Location: /MusicHub/public/index.php?page=home');
             exit;
         }
         break;

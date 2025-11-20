@@ -7,21 +7,22 @@ class ReviewController {
         $pdo = Database::getInstance();
         $this -> music = new Music($pdo);
     }
-    public function showValidationTask($twig): void
-    {
+    public function showValidationTask($twig): void {
         $validatorId = $_SESSION['user_id'];
-        $assignedSongId = $this->music->validate($validatorId);
+        $assignedSong = $this->music->findAssignedValidationTask($validatorId);
 
-        if ($assignedSongId) {
-            $songDetails = $this->music->findById($assignedSongId);
-            echo $twig->render('review_validate.html.twig', [
-                'song' => $songDetails
-            ]);
+        if ($assignedSong) {
+            $songDetails = $assignedSong;
         } else {
-            echo $twig->render('no_songs_to_validate.html.twig', [
-                'message' => 'Děkujeme, momentálně jsou zvalidovány všechny písničky'
-            ]);
+            $newlyAssignedSongId = $this->music->validate($validatorId);
+            if ($newlyAssignedSongId) {
+                $songDetails = $this->music->findById($newlyAssignedSongId);
+            } else {
+                echo $twig->render('no_songs_to_validate.html.twig');
+                return;
+            }
         }
+        echo $twig->render('review_validate.html.twig', ['song' => $songDetails]);
 
     }
 }

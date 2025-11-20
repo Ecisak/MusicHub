@@ -16,12 +16,18 @@ class Music {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function findAssignedValidationTask($validatorId) {
+        $stmt = $this->db->prepare("SELECT * FROM songs WHERE assigned_validator_id = :validator_id AND status = 'pending'");
+        $stmt->execute(['validator_id' => $validatorId]);
+        return $stmt->fetch();
+    }
     public function findForValidation(int $validatorId) {
         $stmt = $this->db->prepare("
         SELECT id_song FROM songs
         WHERE
             status = 'pending'
-            AND user_id != :validator_id
+            AND id_user != :validator_id
             AND (
             assigned_validator_id IS NULL
             OR assigned_at < NOW() - INTERVAL 1 DAY
@@ -31,8 +37,8 @@ class Music {
         FOR UPDATE;"
         );
         $stmt->execute(['validator_id' => $validatorId]);
-        return $stmt->fetchColumn();
-
+        $result = $stmt->fetchColumn();
+        return $result;
     }
     public function assignForValidation(int $validatorId, int $songId) {
         $stmt = $this->db->prepare("UPDATE songs SET assigned_validator_id = :validator_id, assigned_at = NOW() WHERE id_song = :song_id");
@@ -43,14 +49,19 @@ class Music {
         $this->db->beginTransaction();
         try {
             $songId = $this->findForValidation($validatorId);
-        if ($songId) {
-            $this->assignForValidation($validatorId, $songId);
-        }
-        $this->db->commit();
-        return $songId;
+            if ($songId) {
+                $this->assignForValidation($validatorId, $songId);
+            }
+            $this->db->commit();
+            return $songId; // Nezapomeň vrátit ID!
         } catch (Exception $e) {
             $this->db->rollBack();
             error_log('[ERROR] Error when assigning' . $e->getMessage());
+
+            // --- NÁŠ DOČASNÝ LADICÍ BLOK ---
+            die("Chyba zachycena v transakci: " . $e->getMessage());
+            // --- KONEC LADICÍHO BLOKU ---
+
             return null;
         }
     }
@@ -65,6 +76,11 @@ class Music {
         $stmt = $this-> db-> prepare("INSERT INTO `songs` (`author`, `cover_image`, `filename`, `id_genre`,`id_user`, `release_year`, `status`, `title`, `uploaded_at`) 
 VALUES (:author, :coverImage, :filename, :id_genre, :id_user, :release_year, :status, :title, :uploaded_at)");
         $stmt->execute($data);
+    }
+
+    public function updateValidationStatus(int $songId, string $status) {
+        $stmt = $this->db->prepare("UPDATE songs SET status = :status, assigned_validator_id = NULL, assigned_at = NULL WHERE id_song = :song_id");
+        $stmt->execute(['status' => $status, 'song_id' => $songId]);
     }
 
 }

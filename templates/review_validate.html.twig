@@ -1,2 +1,14 @@
-{% extends layout.html %}
+{% extends 'layout.html.twig' %}
+
 {% block content %}
+    <h1>Splňuje písnička veškerá pravidla?</h1>
+    <img alt='album-cover' src="/MusicHub/public/uploads/covers/{{ song.cover_image }}">
+    <audio controls src="/MusicHub/public/uploads/music/{{ song.filename }}"></audio>
+    <p> {{ song.title }}</p>
+    <p> {{ song.author }}</p>
+    <form method="post" action="/MusicHub/public/index.php?page=process_validation">
+        <input type="hidden" name="id" value="{{ song.id_song }}">
+        <button type="submit" name="action" value="approve">Prijmout</button>
+        <button type="submit" name="action" value="rejected">Zamitnout</button>
+    </form>
+{% endblock %}

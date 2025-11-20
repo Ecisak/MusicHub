@@ -102,6 +102,35 @@ switch ($page) {
         }
         break;
 
+    case 'process_validation':
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_SESSION['role']) || $_SESSION['role'] !== 'reviewer') {
+            header('Location: /MusicHub/public/index.php?page=home');
+            exit;
+        }
+
+        if (isset($_POST['id'], $_POST['action'])) {
+            $songId = (int)$_POST['id'];
+            $action = $_POST['action'];
+
+            $newStatus = '';
+            if ($action === "approve") {
+                $newStatus = 'accepted';
+                $_SESSION['flash_message'] = 'Písnička byla schválena k recenzi.';
+            } elseif ($action === 'reject') {
+                $newStatus = 'rejected';
+                $_SESSION['flash_message'] = 'Písnička byla zamítnuta.';
+            }
+
+            if ($newStatus) {
+                $musicModel = new Music(Database::getInstance());
+                $musicModel->updateValidationStatus($songId, $newStatus); // Tvoje nová metoda
+            }
+        }
+
+        header('Location: /MusicHub/public/index.php?page=review');
+        exit;
+
     case 'home':
     default:
         // Display home page

@@ -17,6 +17,12 @@ class Music {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getAllAccepted() {
+        $stmt = $this->db->prepare("SELECT * FROM `songs` WHERE status = 'accepted'");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function findAssignedValidationTask($validatorId) {
         $stmt = $this->db->prepare("SELECT * FROM songs WHERE assigned_validator_id = :validator_id AND status = 'pending'");
         $stmt->execute(['validator_id' => $validatorId]);

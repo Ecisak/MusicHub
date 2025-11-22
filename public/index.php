@@ -21,6 +21,7 @@ require_once __DIR__ . '/../controllers/ValidationController.php';
 require_once __DIR__ . '/../controllers/LogoutController.php';
 require_once __DIR__ . '/../controllers/AddMusicController.php';
 require_once __DIR__ . '/../controllers/ReviewController.php';
+require_once __DIR__ . '/../controllers/ExploreController.php';
 
 // Get the requested page from GET parameter, default to 'home'
 $page = $_GET['page'] ?? 'home';
@@ -130,6 +131,12 @@ switch ($page) {
 
         header('Location: /MusicHub/public/index.php?page=review');
         exit;
+
+    case 'explore':
+        $controller = new ExploreController();
+        $controller->showExplore($twig);
+        break;
+
 
     case 'home':
     default:

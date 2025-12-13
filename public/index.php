@@ -137,7 +137,16 @@ switch ($page) {
         $controller->showExplore($twig);
         break;
 
-
+    case 'song':
+        if (isset($_GET['id'])) {
+            $songId = (int)$_GET['id'];
+            $controller = new ExploreController();
+            $controller->showSongDetail($songId, $twig);
+        } else {
+            header('Location: /MusicHub/public/index.php?page=explore');
+            exit;
+        }
+        break;
     case 'home':
     default:
         // Display home page

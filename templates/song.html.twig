@@ -1,0 +1,43 @@
+{% extends 'layout.html.twig' %}
+
+
+
+{% block content %}
+<div class="container mt-4 song-container">
+    <div class="card mb-3 song-card">
+        <img src="/MusicHub/public/uploads/covers/{{ song.cover_image }}" class="card-img song-img" alt="{{ song.title }} cover image">
+        <audio controls class="song-control" src="/MusicHub/public/uploads/music/{{ song.filename }}"></audio>
+        <div class="card-body">
+            <h1 class="card-title song-title">{{ song.title }}</h1>
+            <p class="card-text song-text song-author">{{ song.author }}</p>
+            <div class="song">
+                <p class="card-text song-text song">{{ genre.genre }} - {{ song.release_year }}</p>
+            </div>
+        </div>
+        <div class="card-footer border-top-0 song-footer">
+            <h1 class="card-header song-title">Recenze</h1>
+            {% if reviews is empty %}
+            <p class="card-text review-text">Zatím žádné recenze.</p>
+            {% else %}
+            {% for review in reviews %}
+                <div>
+                    <div class="card mb-3 song-card">
+                        <div class="card-body">
+                            <h5 class="card-title song-title">{{ review.username }}"</h5>
+                            <h6 class="card-subtitle song-artist">{{ review.created_at }}</h6>
+                            <div class="mb-2">
+                                <span class="badge bg-primary">Kvalita: {{ review.rating_quality }}/10</span>
+                                <span class="badge bg-info">Originalita: {{  review.rating_originality }}/10}}</span>
+                                <span class="badge bg-success">Text: {{ review.rating_lyrics }}/10</span>
+                            </div>
+                            <p class="card-text review-text"> {{ review.comment }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

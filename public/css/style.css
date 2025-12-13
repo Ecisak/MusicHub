@@ -69,7 +69,7 @@
 }
 .nav {
     margin-top: 7%;
-    justify1-content: left;
+    justify-content: left;
 
 
 }
@@ -153,4 +153,55 @@
     color: white;
 }
 
+.song-title {
+    text-align: center;
+    font-weight: bolder;
+    color: #e2e8f0;
+}
 
+.song-text {
+    font-weight: bold;
+    color: #94a3b8;
+}
+
+.song {
+    display: flex;
+    justify-content: center;
+}
+.song-img {
+    align-items: center;
+    margin: auto;
+    max-width: 75%;
+    max-height: 75%;
+    padding: 10px;
+    border-radius: 1rem;
+    border: 20px #5e17eb;
+}
+
+.song-card {
+    background-color: #004E98;
+}
+
+.song-footer {
+    background-color: #004E98;
+}
+
+.song-container {
+    background-color: #303030;
+}
+
+.song-author {
+    text-align: center;
+}
+.song-control {
+    margin: -40px auto auto;
+    min-width: 73.5%;
+    border-radius:1rem;
+    justify-content: center;
+}
+
+.review-text {
+    font-weight: bold;
+    color: #94a3b8;
+    padding-left: 15%;
+}

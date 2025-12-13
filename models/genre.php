@@ -10,4 +10,10 @@ class Genre {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    function get($id) {
+        $stmt = $this->db->prepare("SELECT * FROM genres WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

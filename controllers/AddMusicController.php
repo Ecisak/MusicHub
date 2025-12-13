@@ -41,7 +41,7 @@ class AddMusicController {
             $errors['genre_id'] = 'Zvolení žánru je povinné';
         }
         if (empty($release_year)) {
-            $errors["release-year"] = "rok vydani je povinny";
+            $errors["release-year"] = "rok vydání je povinné";
         }
         $newImageName = null;
         $imagePath = null;

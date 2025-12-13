@@ -7,8 +7,9 @@
             {% for song in exploreSongs %}
                 <div class="col">
                     <div class="card h-100 shadow-sm">
-                        <img src="/MusicHub/public/uploads/covers/{{ song.cover_image }}" class="card-img-top" alt="{{ song.title }}-cover" style="height: 250px; object-fit: cover;">
-
+                        <a href="/MusicHub/public/index.php?page=song&id={{ song.id_song }}">
+                            <img src="/MusicHub/public/uploads/covers/{{ song.cover_image }}" class="card-img-top" alt="{{ song.title }}-cover" style="height: 250px; object-fit: cover;">
+                        </a>
                         <div class="card-body">
                             <h5 class="card-title">{{ song.title }}</h5>
                             <p class="card-text text-muted">{{ song.author }}</p>

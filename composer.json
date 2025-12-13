@@ -1,6 +1,7 @@
 {
     "require": {
         "twig/twig": "^3.22",
-      "ext-pdo": "*"
+      "ext-pdo": "*",
+        "ezyang/htmlpurifier": "^4.19"
     }
 }

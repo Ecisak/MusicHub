@@ -17,8 +17,47 @@ class Music {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getAllAccepted() {
-        $stmt = $this->db->prepare("SELECT * FROM `songs` WHERE status = 'accepted'");
+    public function getAllAccepted(string $orderBy = 'date', string $direction = 'DESC') {
+        $allowedColumns = [
+            'date' => 'songs.uploaded_at',
+            'rating' => 'average_rating',
+            'lyrics' => 'average_lyrics',
+            'quality' => 'average_quality',
+            'originality' => 'average_originality'
+        ];
+
+        $sortColumn = $allowedColumns[$orderBy] ?? $allowedColumns['date'];
+
+        $direction = strtoupper($direction);
+        if ($direction !== 'ASC' && $direction !== 'DESC') {
+            $direction = 'DESC';
+        }
+        $sql = "
+        SELECT
+            songs.*,
+            users.username as author_name,
+            genre.genre as genre_name,
+            (SELECT ROUND(AVG((rating_quality + rating_originality + rating_lyrics) / 3), 1)
+             FROM reviews WHERE reviews.id_song = songs.id_song AND reviews.status = 'approved') as average_rating,
+             
+            (SELECT ROUND(AVG(rating_quality), 1)
+             FROM reviews WHERE reviews.id_song = songs.id_song AND reviews.status = 'approved') as average_quality,
+             
+            (SELECT ROUND(AVG(rating_originality), 1)
+             FROM reviews WHERE reviews.id_song = songs.id_song AND reviews.status = 'approved') as average_originality,
+             
+            (SELECT ROUND(AVG(rating_lyrics), 1)
+             FROM reviews WHERE reviews.id_song = songs.id_song AND reviews.status = 'approved') as average_lyrics
+             
+        FROM songs
+        LEFT JOIN users ON songs.id_user = users.id_user
+        LEFT JOIN genres genre ON songs.id_genre = genre.id
+        WHERE songs.status = 'accepted'
+        
+        ORDER BY $sortColumn $direction
+        ";
+
+        $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -63,17 +102,37 @@ class Music {
         } catch (Exception $e) {
             $this->db->rollBack();
             error_log('[ERROR] Error when assigning' . $e->getMessage());
-
-            // --- NÁŠ DOČASNÝ LADICÍ BLOK ---
-            die("Chyba zachycena v transakci: " . $e->getMessage());
-            // --- KONEC LADICÍHO BLOKU ---
-
             return null;
         }
     }
 
     public function findById(int $id) {
-        $stmt = $this->db->prepare("SELECT * FROM `songs` WHERE id_song = :id");
+        $sql = "
+    SELECT 
+        songs.*,
+        users.username as author_name,
+        genre.genre as genre_name,
+        
+        -- Zkopírované výpočty průměrů
+        (SELECT ROUND(AVG((rating_quality + rating_originality + rating_lyrics) / 3), 1)
+         FROM reviews WHERE reviews.id_song = songs.id_song AND reviews.status = 'approved') as average_rating,
+         
+        (SELECT ROUND(AVG(rating_quality), 1)
+         FROM reviews WHERE reviews.id_song = songs.id_song AND reviews.status = 'approved') as average_quality,
+         
+        (SELECT ROUND(AVG(rating_originality), 1)
+         FROM reviews WHERE reviews.id_song = songs.id_song AND reviews.status = 'approved') as average_originality,
+         
+        (SELECT ROUND(AVG(rating_lyrics), 1)
+         FROM reviews WHERE reviews.id_song = songs.id_song AND reviews.status = 'approved') as average_lyrics
+         
+    FROM songs
+    LEFT JOIN users ON songs.id_user = users.id_user
+    LEFT JOIN genres genre ON songs.id_genre = genre.id
+    WHERE id_song = :id
+    ";
+
+        $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -87,6 +146,12 @@ VALUES (:author, :coverImage, :filename, :id_genre, :id_user, :release_year, :st
     public function updateValidationStatus(int $songId, string $status) {
         $stmt = $this->db->prepare("UPDATE songs SET status = :status, assigned_validator_id = NULL, assigned_at = NULL WHERE id_song = :song_id");
         $stmt->execute(['status' => $status, 'song_id' => $songId]);
+    }
+
+    public function getPendingCount() {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM `songs` WHERE status = 'pending'");
+        $stmt->execute();
+        return $stmt->fetchColumn();
     }
 
 }

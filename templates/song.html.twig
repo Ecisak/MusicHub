@@ -13,7 +13,84 @@
             <div class="song">
                 <p class="card-text song-text song">{{ genre.genre }} - {{ song.release_year }}</p>
             </div>
+            <div class="row">
+                <div class="col-md-4 text-center border-end d-flex flex-column justify-content-center">
+                    <h2 class="display-4 fw-bold text-warning">
+                        ★ {{ song.average_rating | default('0') }}
+                    </h2>
+                    <p class="song-text">Celkové hodnocení</p>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="song-text">🎧 Kvalita zvuku</span>
+                            <span class="song-text">{{ song.average_quality | default('0') }}/10</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ song.average_quality * 10 }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="song-text">💡 Originalita</span>
+                            <span class="song-text">{{ song.average_originality | default('0') }}/10</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ song.average_originality * 10 }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="song-text">📝 Text</span>
+                            <span class="song-text">{{ song.average_lyrics | default('0') }}/10</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ song.average_lyrics * 10 }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        </div>
+        {% if user_role == 'reviewer' and current_user_id != song.id_user and not hasReviewed %}
+            <div class="card mt-4 song-card">
+                <div class="card-title review-title">
+                    Napsat recenzi
+                </div>
+                <div class="card-body">
+                    <form action="/MusicHub/public/index.php?page=process_review" method="POST">
+                        <input type="hidden" name="song_id" value="{{ song.id_song }}">
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label review-text-np">Kvalita (1-10)</label>
+                                <input type="number" name="rating_quality" class="form-control" min="1" max="10" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label review-text-np">Originalita (1-10)</label>
+                                <input type="number" name="rating_originality" class="form-control" min="1" max="10" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label review-text-np">Text (1-10)</label>
+                                <input type="number" name="rating_lyrics" class="form-control" min="1" max="10" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label review-text-np">Slovní hodnocení</label>
+                            <textarea name="comment" id="editor" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Odeslat recenzi</button>
+                    </form>
+                </div>
+
+        {% elseif hasReviewed %}
+            <div class="alert alert-success mt-4"> Tuto skladbu už jsi ohodnotil. Díky za tvojí práci!</div>
+        {% endif %}
         <div class="card-footer border-top-0 song-footer">
             <h1 class="card-header song-title">Recenze</h1>
             {% if reviews is empty %}
@@ -21,16 +98,16 @@
             {% else %}
             {% for review in reviews %}
                 <div>
-                    <div class="card mb-3 song-card">
+                    <div class="card mb-3 review-card">
                         <div class="card-body">
-                            <h5 class="card-title song-title">{{ review.username }}"</h5>
-                            <h6 class="card-subtitle song-artist">{{ review.created_at }}</h6>
+                            <h6 class="card-subtitle song-artist">{{ review.created_at | date("d. m. Y") }}</h6>
+                            <h5 class="card-title review-author">Recenzent: {{ review.username }}</h5>
                             <div class="mb-2">
                                 <span class="badge bg-primary">Kvalita: {{ review.rating_quality }}/10</span>
-                                <span class="badge bg-info">Originalita: {{  review.rating_originality }}/10}}</span>
+                                <span class="badge bg-info">Originalita: {{  review.rating_originality }}/10</span>
                                 <span class="badge bg-success">Text: {{ review.rating_lyrics }}/10</span>
                             </div>
-                            <p class="card-text review-text"> {{ review.comment }}</p>
+                            <p class="card-text review-text"> {{ review.comment | raw }}</p>
                         </div>
                     </div>
                     {% endfor %}
@@ -38,6 +115,26 @@
                 </div>
         </div>
 
+
+    </div>
+
+    </div>
     </div>
 </div>
+    <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
+    <script>
+        ClassicEditor
+            .create( document.querySelector( '#editor' ), {
+                toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
+                placeholder: 'Napište své slovní hodnocení...'
+            } )
+            .catch( error => {
+                console.error( error );
+            } );
+    </script>
+    <style>
+        .ck-editor__editable_inline {
+            min-height: 200px;
+        }
+    </style>
 {% endblock content %}

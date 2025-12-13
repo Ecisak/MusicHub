@@ -18,7 +18,6 @@ class AddMusicController {
         unset($_SESSION['errors']);
 
 
-// TODO: test the controller and the form
     }
     public function addMusic():void {
         $errors = [];

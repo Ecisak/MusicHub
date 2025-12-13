@@ -48,10 +48,18 @@
                     </li>
                     <li class="nav-item my-nav"><a class="nav-link" href="/MusicHub/public/index.php?page=leaderboard">Žebříček</a>
                     </li>
-                    <li class="nav-item my-nav"><a class="nav-link" href="/MusicHub/public/index.php?page=add">Přidat
-                            Hudbu</a></li>
-                    <li class="nav-item my-nav"><a class="nav-link"
-                                                   href="/MusicHub/public/index.php?page=about">About</a></li>
+                    <li class="nav-item my-nav"><a class="nav-link" href="/MusicHub/public/index.php?page=add">Přidat Hudbu</a></li>
+                    <li class="nav-item my-nav"><a class="nav-link" href="/MusicHub/public/index.php?page=explore">Prohlížet Hudbu</a></li>
+                    <li class="nav-item my-nav"><a class="nav-link" href="/MusicHub/public/index.php?page=about">O nás</a></li>
+                    {% if role == 'reviewer' and pending_songs_count > 0 %}
+                    <li class="nav-item my-nav">
+                        <a class="nav-link" href="/MusicHub/public/index.php?page=review">
+                            Validace
+                            <span class="badge bg-danger">{{  pending_songs_count }}</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
                 </ul>
 
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">

@@ -22,15 +22,23 @@ require_once __DIR__ . '/../controllers/LogoutController.php';
 require_once __DIR__ . '/../controllers/AddMusicController.php';
 require_once __DIR__ . '/../controllers/ReviewController.php';
 require_once __DIR__ . '/../controllers/ExploreController.php';
+require_once __DIR__ . '/../models/music.php';
+require_once __DIR__ . '/../controllers/AdminController.php';
+
 
 // Get the requested page from GET parameter, default to 'home'
 $page = $_GET['page'] ?? 'home';
 $loader = new FilesystemLoader(__DIR__ . '/../templates');
+$pdo = Database::getInstance();
+$music = new Music($pdo);
 $twig = new Environment($loader, [
     'cache' => false
 ]);
 $twig->addGlobal('isLoggedIn', isset($_SESSION['user_id']));
 $twig->addGlobal('username', $_SESSION['username'] ?? '');
+$twig->addGlobal('pending_songs_count', $music->getPendingCount());
+$twig->addGlobal('user_role', $_SESSION['role'] ?? '');
+$twig->addGlobal('current_user_id', $_SESSION['user_id'] ?? 0);
 $flashMessage = '';
 if (isset($_SESSION['flash-message'])) {
     $flashMessage = $_SESSION['flash-message'];
@@ -104,7 +112,6 @@ switch ($page) {
         break;
 
     case 'process_validation':
-
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_SESSION['role']) || $_SESSION['role'] !== 'reviewer') {
             header('Location: /MusicHub/public/index.php?page=home');
             exit;
@@ -125,7 +132,7 @@ switch ($page) {
 
             if ($newStatus) {
                 $musicModel = new Music(Database::getInstance());
-                $musicModel->updateValidationStatus($songId, $newStatus); // Tvoje nová metoda
+                $musicModel->updateValidationStatus($songId, $newStatus);
             }
         }
 
@@ -147,6 +154,23 @@ switch ($page) {
             exit;
         }
         break;
+
+    case 'process_review':
+        $controller = new ReviewController();
+        $controller->submitReview();
+        break;
+
+
+    case 'admin_reviews':
+        $controller = new AdminController();
+        $controller->showPendingReviews($twig);
+        break;
+
+    case 'process_admin_review':
+        $controller = new AdminController();
+        $controller->processReview();
+        break;
+
     case 'home':
     default:
         // Display home page

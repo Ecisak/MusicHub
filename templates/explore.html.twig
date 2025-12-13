@@ -1,26 +1,69 @@
 {% extends 'layout.html.twig' %}
 
 {% block content %}
-    <div class="container mt-4">
+    <div class="container explore-container">
         <h1 class="mb-4">Prohlížej Hudbu</h1>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
+        <form action="/MusicHub/public/index.php" method="GET" class="row g-2 align-items-center mb-4">
+            <input type="hidden" name="page" value="explore">
+            <div class="col-auto">
+                <label class="visually-hidden" for="sortSelect">Řadit podle</label>
+                <select class="form-select" name="sort" id="sortSelect" onchange="this.form.submit()">
+                    <option value="date"        {% if currentSort == 'date' %}selected{% endif %}>Datum přidání</option>
+                    <option value="rating"      {% if currentSort == 'rating' %}selected{% endif %}>Celkové hodnocení</option>
+                    <option value="lyrics"      {% if currentSort == 'lyrics' %}selected{% endif %}>Text</option>
+                    <option value="originality" {% if currentSort == 'originality' %}selected{% endif %}>Originalita</option>
+                    <option value="quality"     {% if currentSort == 'quality' %}selected{% endif %}>Kvalita</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label class="visually-hidden" for="dirSelect">Směr</label>
+                <select class="form-select" name="dir" id="dirSelect" onchange="this.form.submit()">
+                    <option value="desc" {% if currentDir == 'desc' %}selected{% endif %}>Sestupně (Od nejvyššího)</option>
+                    <option value="asc"  {% if currentDir == 'asc' %}selected{% endif %}>Vzestupně (Od nejnižšího)</option>
+                </select>
+            </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Seřadit</button>
+        </div>
+        </form>
+        <div class="row row-cols-1 row-cols-md-3 g-3">
             {% for song in exploreSongs %}
                 <div class="col">
-                    <div class="card h-100 shadow-sm">
+                    <div class="card shadow-sm h-100">
+
                         <a href="/MusicHub/public/index.php?page=song&id={{ song.id_song }}">
                             <img src="/MusicHub/public/uploads/covers/{{ song.cover_image }}" class="card-img-top" alt="{{ song.title }}-cover" style="height: 250px; object-fit: cover;">
                         </a>
+
                         <div class="card-body">
-                            <h5 class="card-title">{{ song.title }}</h5>
-                            <p class="card-text text-muted">{{ song.author }}</p>
+                            <h5 class="card-title text-truncate">{{ song.title }}</h5>
+                            <p class="card-text text-muted small">{{ song.author }}</p>
+
+                            <div class="rating-box mt-2">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="text-warning fs-5 me-1">★</span>
+                                    <span class="fw-bold fs-5">{{ song.average_rating | default('-') }}</span>
+                                    <span class="text-muted small ms-1">/ 10</span>
+                                </div>
+
+                                {% if song.average_rating %}
+                                    <div class="small text-secondary d-flex justify-content-between">
+                                        <span title="Kvalita">🎧 {{ song.average_quality }}</span>
+                                        <span title="Originalita">💡 {{ song.average_originality }}</span>
+                                        <span title="Text">📝 {{ song.average_lyrics }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
 
                         <div class="card-footer bg-white border-top-0">
                             <audio controls class="w-100" src="/MusicHub/public/uploads/music/{{ song.filename }}"></audio>
                         </div>
+
                     </div>
                 </div>
             {% endfor %}
+        </div>
         </div>
     </div>
 {% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'layout.html.twig' %}
+{% block content %}
+
+     <div class="container mt-5">
+            <h1 class="mb-4">Schvalování recenzí</h1>
+
+            {% if reviews is empty %}
+                <div class="alert alert-success">
+                    Žádné recenze nečekají na schválení.
+                </div>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered bg-white shadow-sm">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>Datum</th>
+                            <th>Autor</th>
+                            <th>Skladba</th>
+                            <th style="width: 40%;">Text recenze</th>
+                            <th>Hodnocení</th>
+                            <th>Akce</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for review in reviews %}
+                            <tr>
+                                <td>{{ review.created_at | date("d.m.Y H:i") }}</td>
+                                <td><strong>{{ review.reviewer_name }}</strong></td>
+                                <td>{{ review.song_title }}</td>
+
+                                <td class="small">
+                                    <div style="max-height: 150px; overflow-y: auto;">
+                                        {{ review.comment | raw }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="d-flex flex-column small">
+                                        <span>Kvalita: <b>{{ review.rating_quality }}</b></span>
+                                        <span>Orig.: <b>{{ review.rating_originality }}</b></span>
+                                        <span>Text: <b>{{ review.rating_lyrics }}</b></span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <form action="/MusicHub/public/index.php?page=process_admin_review" method="POST" class="d-flex gap-2">
+                                        <input type="hidden" name="review_id" value="{{ review.id_review }}">
+
+                                        <button type="submit" name="action" value="approve" class="btn btn-success btn-sm" title="Schválit">
+                                            Schválit
+                                        </button>
+
+                                        <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm" title="Zamítnout" onclick="return confirm('Opravdu zamítnout?')">
+                                            Zamítnout
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    {% endblock %}

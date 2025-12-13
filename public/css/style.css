@@ -36,6 +36,7 @@
 
 /* Main Container */
 .container {
+    max-width: 1000px;
     background-color: #424242;
     border-radius: 10px;
     color: white;
@@ -187,6 +188,7 @@
 }
 
 .song-container {
+    max-width: 1000px;
     background-color: #303030;
 }
 
@@ -203,5 +205,35 @@
 .review-text {
     font-weight: bold;
     color: #94a3b8;
-    padding-left: 15%;
+    padding: 15px;
 }
+
+.review-text-np {
+    font-weight: bold;
+    color: #94a3b8;
+}
+
+.review-title {
+    font-weight: bolder;
+    color: #e2e8f0;
+    padding: 15px;
+}
+
+.review-author {
+    font-weight: bolder;
+
+}
+
+.review-card {
+    background-color: #e2e8f0;
+    border: 6px solid #1B98E0;
+    border-radius: 10px;
+}
+
+.explore-container {
+    max-width: 1000px;
+    border: 1px solid #e2e8f0;
+    background-color: #004E98;
+}
+
+

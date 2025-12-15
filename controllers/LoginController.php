@@ -22,6 +22,8 @@ class LoginController
 
     /**
      * Display the login form
+     * @param Twig\Environment $twig The Twig environment instance.
+     * @return void
      */
     public function showForm($twig): void
     {
@@ -33,51 +35,78 @@ class LoginController
             'csrf_token' => $_SESSION['csrf_token'] ?? '',
             'errors' => $_SESSION['errors'] ?? []
         ]);
+        // Clear errors after displaying them
         unset($_SESSION['errors']);
     }
 
     /**
-     * Process user login
+     * Process user login attempt.
+     * @return void
      */
     public function login(): void
     {
-        // Only process POST requests
+        // Check for POST request method
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header("Location: /MusicHub/public/index.php?page=login");
             exit;
         }
 
         $errors = [];
-
-        // Sanitize input data
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
 
-        // Validate CSRF token
+        // CSRF Token validation
         if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf'])) {
-            $errors[] = "CSRF token error";
+            $errors['general'] = "Chyba CSRF tokenu.";
         }
 
-        // Authenticate user if no CSRF errors
+        // Attempt to authenticate the user
         if (empty($errors)) {
             $user = $this->userModel->findByEmail($email);
-            // Verify user exists and password is correct
-            if ($user && password_verify($password, $user['password_hash'])) {
-                // Set session variables for logged-in user
-                $_SESSION['user_id'] = $user['id_user'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
 
-                // Redirect to home page
-                header("Location: /MusicHub/public/index.php?page=home");
-                exit;
+            if ($user && password_verify($password, $user['password_hash'])) {
+
+                // Check for 'banned' status
+                if ($user['role'] === 'banned') {
+                    $errors['general'] = 'Váš účet byl zablokován administrátorem.';
+                }
+                else {
+                    // LOGIN SUCCESS
+                    // Set session variables
+                    $_SESSION['user_id'] = $user['id_user'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['role'] = $user['role'];
+
+                    // Set success flash message
+                    $_SESSION['flash'] = [
+                        'message' => "Vítejte, " . $user['username'] . "! Úspěšné přihlášení.",
+                        'type' => 'success'
+                    ];
+
+                    // Redirect to home page
+                    header("Location: /MusicHub/public/index.php?page=home");
+                    exit;
+                }
+
             } else {
-                $errors[] = "Invalid email or password";
+                // Invalid credentials
+                $errors['general'] = "Neplatný email nebo heslo.";
             }
         }
 
-        // Store errors and show form again
+        // --- ERROR HANDLING BLOCK ---
+
+        // Store errors for the form display
         $_SESSION['errors'] = $errors;
+
+        // Set flash message for the general error
+        $_SESSION['flash'] = [
+            'message' => $errors['general'] ?? "Chyba přihlášení. Zkontrolujte údaje.", // Use specific error or a default one
+            'type' => 'danger'
+        ];
+
+        // Redirect back to the login form
         header("Location: /MusicHub/public/index.php?page=login");
-        exit;    }
+        exit;
+    }
 }

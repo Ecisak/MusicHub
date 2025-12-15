@@ -1,0 +1,1 @@
+[FATAL] SQLSTATE[22003]: Numeric value out of range: 1264 Out of range value for column 'release_year' at row 1

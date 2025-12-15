@@ -1,100 +1,163 @@
+
 <!doctype html>
 <html lang="cs">
 <head>
-    <!-- Character Encoding and Viewport -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS (Bootstrap v5.3.8) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../public/css/style.css">
 
-    <!-- Page Title -->
-    <title>MusicHub - Domovská stránka</title>
+    <!-- Dynamic Page Title -->
+    <title>{% block title %}Hlavní stránka{% endblock %} - MusicHub</title>
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="../public/images/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../public/images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../public/images/favicon-16x16.png">
-    <link rel="manifest" href="../public/images/site.webmanifest">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
 </head>
 <body>
 
+<!-- TOAST CONTAINER FOR FLASH MESSAGES -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+    {% if flash.message %}
+        <!-- Set Toast color based on flash.type (success, danger, info) -->
+        <div id="flashToast"
+             class="toast align-items-center text-white bg-{{ flash.type }} border-0"
+             role="alert"
+             aria-live="assertive"
+             aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-bold">
+                    {{ flash.message }}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    {% endif %}
+</div>
+<!-- End Toast Container -->
+
+
 <!-- Background Container -->
 <div class="background">
-    {% if flashMessage %}
-        <div class="alert alert-info" role="alert">
-            {{ flashMessage }}
-        </div>
-        {% endif %}
-        <nav class="navbar navbar-expand-lg">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #5e17eb;">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/MusicHub/public/index.php?page=home">
-                <img class=logo src="../public/images/MusicHub..svg" alt="MusicHub Logo">
+            <!-- Navbar Brand/Logo -->
+            <a class="navbar-brand fw-bold" href="/MusicHub/public/index.php?page=home">
+                <img class=logo src="../public/images/MusicHub..svg" alt="MusicHub Logo" style="height: 30px;">
             </a>
+            <!-- Navbar Toggler for mobile -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item my-nav"><a class="nav-link active" href="/MusicHub/public/index.php?page=home">Domů</a>
+
+                    <!-- DYNAMIC NAVIGATION LINKS -->
+                    <li class="nav-item my-nav"><a class="nav-link {% if current_page == 'home' %}active{% endif %}" href="/MusicHub/public/index.php?page=home">Domů</a>
                     </li>
-                    <li class="nav-item my-nav"><a class="nav-link" href="/MusicHub/public/index.php?page=leaderboard">Žebříček</a>
+                    <li class="nav-item my-nav"><a class="nav-link {% if current_page == 'leaderboard' %}active{% endif %}" href="/MusicHub/public/index.php?page=leaderboard">Žebříček</a>
                     </li>
-                    <li class="nav-item my-nav"><a class="nav-link" href="/MusicHub/public/index.php?page=add">Přidat Hudbu</a></li>
-                    <li class="nav-item my-nav"><a class="nav-link" href="/MusicHub/public/index.php?page=explore">Prohlížet Hudbu</a></li>
-                    <li class="nav-item my-nav"><a class="nav-link" href="/MusicHub/public/index.php?page=about">O nás</a></li>
-                    {% if role == 'reviewer' and pending_songs_count > 0 %}
-                    <li class="nav-item my-nav">
-                        <a class="nav-link" href="/MusicHub/public/index.php?page=review">
-                            Validace
-                            <span class="badge bg-danger">{{  pending_songs_count }}</span>
-                        </a>
-                    </li>
+                    <li class="nav-item my-nav"><a class="nav-link {% if current_page == 'explore' %}active{% endif %}" href="/MusicHub/public/index.php?page=explore">Prohlížet Hudbu</a></li>
+
+                    <!-- Validation link (visible only to Reviewer/Admin with pending songs) -->
+                    {% if (user_role == 'reviewer' or user_role == 'admin' or user_role =='superadmin') and pending_songs_count > 0 %}
+                        <li class="nav-item my-nav">
+                            <a class="nav-link" href="/MusicHub/public/index.php?page=review">
+                                Validace
+                                <span class="badge bg-danger ms-1">{{  pending_songs_count }}</span>
+                            </a>
+                        </li>
                     {% endif %}
+                    <li class="nav-item my-nav"><a class="nav-link {% if current_page == 'add' %}active{% endif %}" href="/MusicHub/public/index.php?page=add">Nahrát</a></li>
+                    <li class="nav-item my-nav"><a class="nav-link {% if current_page == 'about' %}active{% endif %}" href="/MusicHub/public/index.php?page=about">O nás</a></li>
 
                 </ul>
 
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                            {% if not isLoggedIn%}
-                                <li class="nav-item">
-                                    <a class="btn btn-primary my-btn2 me-2" href="/MusicHub/public/index.php?page=login" role="button">Přihlásit se</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="btn btn-primary my-btn2" href="/MusicHub/public/index.php?page=register" role="button">Registrovat se</a>
-                                </li>
+                    <!-- Guest Links (Login/Register) -->
+                    {% if not isLoggedIn%}
+                        <li class="nav-item">
+                            <a class="btn btn-sm btn-outline-light me-2" href="/MusicHub/public/index.php?page=login" role="button">Přihlásit se</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-sm btn-light" href="/MusicHub/public/index.php?page=register" role="button">Registrovat se</a>
+                        </li>
 
-                            {% else %}
-                                <li class="nav-item">
-                                    <a class="nav-link"><div>Přihlášen: {{ username }}</div></a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="btn btn-primary my-btn2 " href="/MusicHub/public/index.php?page=logout">Odhlásit se</a>
-                                </li>
-                            {% endif %}
-                        </ul>
+                    {% else %}
+                        <!-- User Dropdown Menu -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
+                                <strong>{{ username }}</strong>
+                                <!-- Role Badge -->
+                                {% if user_role == 'superadmin' %}
+                                    <span class="badge bg-warning text-dark" style="font-size: 0.7em;">Superadmin</span>
+                                {% elseif user_role == 'admin' %}
+                                    <span class="badge bg-danger" style="font-size: 0.7em;">Admin</span>
+                                {% elseif user_role == 'reviewer' %}
+                                    <span class="badge bg-info text-dark" style="font-size: 0.7em;">Recenzent</span>
+                                {% else %}
+                                    <span class="badge bg-secondary" style="font-size: 0.7em;">Autor</span>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/MusicHub/public/index.php?page=profile">Můj Profil</a></li>
+                                <!-- Admin/Superadmin Links -->
+                                {% if user_role == 'admin' or user_role == 'superadmin' %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><h6 class="dropdown-header">Administrace</h6></li>
+                                    <li><a class="dropdown-item" href="/MusicHub/public/index.php?page=admin_users">Správa uživatelů</a></li>
+                                    <li><a class="dropdown-item" href="/MusicHub/public/index.php?page=admin_reviews">Schvalování recenzí</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger fw-bold" href="/MusicHub/public/index.php?page=logout">Odhlásit se</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
-
-
     </nav>
 
 
+    <!-- MAIN PAGE CONTENT BLOCK -->
     {% block content %}
     {% endblock %}
 </div>
+
+<!-- Bootstrap JS Bundle (must be at the end of body) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+<!-- JavaScript to initialize and show the flash message Toast -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastEl = document.getElementById('flashToast');
+        if (toastEl) {
+            var toast = new bootstrap.Toast(toastEl, {
+                autohide: true,
+                delay: 5000
+            });
+            toast.show();
+        }
+    });
+</script>
+
+
 </body>
 
 <!-- Footer -->
 <footer class="footer">
-    made with <p class="hearts">&hearts;</p> by <a class="footer-link" href="#">Ecis</a>
+    made with <p class="hearts">&hearts;</p> by <a class="footer-link" href="https://github.com/Ecisak">Ecis</a>
 </footer>
 </html>
+
+  

@@ -94,6 +94,10 @@ class RegistrationController
         // Create new user and redirect to log in
         $user->create($username, $email, $password);
         header("Location: /MusicHub/public/index.php?page=login");
+        $_SESSION['flash'] = [
+            'message' => "Registrace byla úspěšná. Můžete se přihlásit.",
+            'type' => 'success'
+        ];
         exit;
     }
 }

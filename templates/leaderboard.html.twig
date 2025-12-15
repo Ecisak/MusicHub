@@ -1,0 +1,133 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Žebříček{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <!-- Header Section -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary">TOP 10 Žebříček</h1>
+            <p class="text-white fw-bold">Nejlépe hodnocené skladby podle VÁS</p>
+            <!-- Live Update Indicator -->
+            <p class="text-white"><span class="spinner-grow spinner-grow-sm text-success" role="status"></span> Live aktualizace</p>
+        </div>
+
+        <!-- Loader -->
+        <div id="loader" class="text-center my-5">
+            <div class="spinner-border text-primary " role="status">
+                <span class="visually-hidden">Načítám...</span>
+            </div>
+        </div>
+
+        <!-- Leaderboard Table Container -->
+        <div id="leaderboard-content" class="d-none">
+            <div class="card shadow-lg border-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                    <tr>
+                        <th class="text-center py-3">#</th>
+                        <th style="width: 100px;">Cover</th>
+                        <th>Skladba</th>
+                        <th>Autor</th>
+                        <th class="text-center">Hodnocení</th>
+                    </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                    <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initSSE();
+        });
+
+        function initSSE() {
+            const loader = document.getElementById('loader');
+            const content = document.getElementById('leaderboard-content');
+
+            // Use EventSource for Server-Sent Events (SSE) instead of standard fetch
+            // Connect to the endpoint running in a continuous loop
+            const evtSource = new EventSource("/MusicHub/public/index.php?page=api_leaderboard_sse");
+
+            // Function executes every time the server sends a message (e.g., "data: ...")
+            evtSource.onmessage = function(event) {
+                const json = JSON.parse(event.data);
+
+                if (json.status === 'success') {
+                    renderTable(json.data);
+
+                    // Once the first data arrives, hide the loader and show the content
+                    loader.classList.add('d-none');
+                    content.classList.remove('d-none');
+                }
+            };
+
+            evtSource.onerror = function(err) {
+                console.log("Čekám na data nebo připojování...", err);
+                // EventSource attempts to reconnect automatically
+            };
+        }
+
+        function renderTable(songs) {
+            const tbody = document.getElementById('leaderboard-body');
+
+            // Handle empty data state
+            if (songs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">Zatím žádné hodnocené skladby.</td></tr>';
+                return;
+            }
+
+            let html = '';
+            songs.forEach((song, index) => {
+                const rank = index + 1;
+                let rankBadge = `<span class="badge bg-secondary rounded-pill">${rank}</span>`;
+
+                // Use emojis for top 3 ranks
+                if (rank === 1) rankBadge = '🥇';
+                if (rank === 2) rankBadge = '🥈';
+                if (rank === 3) rankBadge = '🥉';
+
+                const rating = song.average_rating ? song.average_rating : '-';
+
+                // Add fade-in animation class for visual effect
+                html += `
+              <tr class="fade-row">
+                    <td class="text-center fs-4">${rankBadge}</td>
+                    <td>
+                        <img src="/MusicHub/public/uploads/covers/${song.cover_image}"
+                             class="rounded shadow-sm"
+                             style="width: 60px; height: 60px; object-fit: cover;">
+                    </td>
+                    <td>
+                        <a href="/MusicHub/public/index.php?page=song&id=${song.id_song}" class="text-decoration-none fw-bold text-dark">
+                            ${song.title}
+                        </a>
+                    </td>
+                    <td class="text-muted">${song.author}</td>
+                    <td class="text-center">
+                        <span class="text-warning">★</span> <strong>${rating}</strong>
+                    </td>
+                </tr>
+            `;
+            });
+
+            // Update the table body content
+            tbody.innerHTML = html;
+        }
+    </script>
+
+    <style>
+        /* CSS for subtle update animation */
+        .fade-row {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0.5; background-color: rgba(0,255,0,0.1); }
+            to { opacity: 1; background-color: transparent; }
+        }
+    </style>
+
+{% endblock %}

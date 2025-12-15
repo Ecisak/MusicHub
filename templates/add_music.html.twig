@@ -1,43 +1,123 @@
 {% extends "layout.html.twig" %}
 
+{% block title %}Nahrát Hudbu{% endblock %}
 {% block content %}
-    <div class="container">
-        <h1>Přidání Hudby</h1>
+    <div class="container mt-5" style="max-width: 600px;">
+        <h1 class="mb-4">Přidání Hudby</h1>
+
+        <!-- ALERT FOR GENERAL SERVER ERRORS (not tied to a specific field) -->
+        {% if errors.general %}
+            <div class="alert alert-danger" role="alert">
+                {{ errors.general }}
+            </div>
+        {% endif %}
+
         <form class="form-horizontal" enctype="multipart/form-data" action="/MusicHub/public/index.php?page=add" method="post">
+            <!-- CSRF Token for security -->
             <input type="hidden" name="csrf" value="{{ csrf_token }}">
+
+            {# 1. Song Title #}
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="inputTitle" name="title" required>
+                <input
+                        type="text"
+                        class="form-control {% if errors.title %}is-invalid{% endif %}"
+                        id="inputTitle"
+                        name="title"
+                        value="{{ old_data.title }}" {# Preserve old value on form reload #}
+                        required
+                >
                 <label for="inputTitle">Název</label>
-                <div class="invalid-feedback"></div>
-                <div class="valid-feedback"></div>
+                {% if errors.title %}
+                    <div class="invalid-feedback d-block">{{ errors.title }}</div>
+                {% endif %}
             </div>
+
+            {# 2. Artist #}
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="inputArtist" name="artist" required>
+                <input
+                        type="text"
+                        class="form-control {% if errors.artist %}is-invalid{% endif %}"
+                        id="inputArtist"
+                        name="artist"
+                        value="{{ old_data.artist }}"
+                        required
+                >
                 <label for="inputArtist">Interpret</label>
-
+                {% if errors.artist %}
+                    <div class="invalid-feedback d-block">{{ errors.artist }}</div>
+                {% endif %}
             </div>
 
-            <div class="col-form-label">
+            {# 3. Genre (Select) #}
+            <div class="mb-3">
                 <label for="genreSelect" class="form-label">Žánr</label>
-                <select class="form-select" id="genreSelect" name="genre-id">
+                <select
+                        class="form-select {% if errors.genre_id %}is-invalid{% endif %}"
+                        id="genreSelect"
+                        name="genre-id"
+                >
+                    <!-- First empty option -->
+                    <option value="" {% if not old_data.genre_id %}selected{% endif %}>Vyberte žánr</option>
                     {% for genre in genres %}
-                    <option value="{{ genre.id }}" >{{ genre.genre }}</option>
+                        <option value="{{ genre.id }}"
+                                {% if old_data.genre_id == genre.id %}selected{% endif %}>
+                            {{ genre.genre }}
+                        </option>
                     {% endfor %}
                 </select>
+                {% if errors.genre_id %}
+                    <div class="invalid-feedback d-block">{{ errors.genre_id }}</div>
+                {% endif %}
             </div>
-            <div class="col-form-label">
+
+            {# 4. Release Year #}
+            <div class="mb-3">
                 <label for="year" class="form-label">Rok vydání</label>
-                <input type="number" class="form-control" id="year" name="release-year" required>
+                <input
+                        type="number"
+                        class="form-control {% if errors['release-year'] %}is-invalid{% endif %}"
+                        id="year"
+                        name="release-year"
+                        value="{{ old_data['release-year'] }}"
+                        required
+                >
+                {% if errors['release-year'] %}
+                    <div class="invalid-feedback d-block">{{ errors['release-year'] }}</div>
+                {% endif %}
             </div>
-            <div class="form-floating mb-3">
-                <input type="file" class="form-control" id="coverImage" name="coverImage" required>
-                <label for="coverImage">Obal alba</label>
+
+            {# 5. Album Cover (File upload) #}
+            <div class="mb-3">
+                <label for="coverImage" class="form-label">Obal alba</label>
+                <input
+                        type="file"
+                        class="form-control {% if errors.coverImage %}is-invalid{% endif %}"
+                        id="coverImage"
+                        name="coverImage"
+                        required
+                >
+                {% if errors.coverImage %}
+                    <div class="invalid-feedback d-block">{{ errors.coverImage }}</div>
+                {% endif %}
             </div>
-            <div class="form-floating mb-3">
-                <input type="file" class="form-control" id="musicUpload" name="musicUpload" required>
-                <label for="musicUpload">Zvuková stopa</label>
+
+            {# 6. Audio Track (File upload) #}
+            <div class="mb-3">
+                <label for="musicUpload" class="form-label">Zvuková stopa</label>
+                <input
+                        type="file"
+                        class="form-control {% if errors.musicUpload %}is-invalid{% endif %}"
+                        id="musicUpload"
+                        name="musicUpload"
+                        required
+                >
+                {% if errors.musicUpload %}
+                    <div class="invalid-feedback d-block">{{ errors.musicUpload }}</div>
+                {% endif %}
             </div>
-            <button type="submit" class="btn btn-primary my-btn w-100">Odeslat</button>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary my-btn w-100 mt-3">Odeslat</button>
         </form>
     </div>
 {% endblock %}

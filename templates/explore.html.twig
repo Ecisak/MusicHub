@@ -1,10 +1,13 @@
 {% extends 'layout.html.twig' %}
+{% block title %}Prohlížení hudby{% endblock %}
 
 {% block content %}
     <div class="container explore-container">
         <h1 class="mb-4">Prohlížej Hudbu</h1>
+        <!-- Sorting and Filtering Form -->
         <form action="/MusicHub/public/index.php" method="GET" class="row g-2 align-items-center mb-4">
             <input type="hidden" name="page" value="explore">
+            <!-- Sort By Select -->
             <div class="col-auto">
                 <label class="visually-hidden" for="sortSelect">Řadit podle</label>
                 <select class="form-select" name="sort" id="sortSelect" onchange="this.form.submit()">
@@ -15,37 +18,47 @@
                     <option value="quality"     {% if currentSort == 'quality' %}selected{% endif %}>Kvalita</option>
                 </select>
             </div>
+            <!-- Direction Select -->
             <div class="col-auto">
                 <label class="visually-hidden" for="dirSelect">Směr</label>
                 <select class="form-select" name="dir" id="dirSelect" onchange="this.form.submit()">
-                    <option value="desc" {% if currentDir == 'desc' %}selected{% endif %}>Sestupně (Od nejvyššího)</option>
-                    <option value="asc"  {% if currentDir == 'asc' %}selected{% endif %}>Vzestupně (Od nejnižšího)</option>
+                    <option value="desc" {% if currentDirection == 'desc' %}selected{% endif %}>Sestupně (Od nejvyššího)</option>
+                    <option value="asc"  {% if currentDirection == 'asc' %}selected{% endif %}>Vzestupně (Od nejnižšího)</option>
                 </select>
             </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">Seřadit</button>
-        </div>
+            <div class="col-auto">
+                <!-- Submit Button (redundant if using onchange but kept for clarity) -->
+                <button type="submit" class="btn btn-primary">Seřadit</button>
+            </div>
         </form>
+
+        <!-- Song Cards Grid -->
         <div class="row row-cols-1 row-cols-md-3 g-3">
             {% for song in exploreSongs %}
                 <div class="col">
-                    <div class="card shadow-sm h-100">
+                    <div class="card shadow-sm h-100">'
 
+                        <!-- Link to song detail page and cover image -->
                         <a href="/MusicHub/public/index.php?page=song&id={{ song.id_song }}">
                             <img src="/MusicHub/public/uploads/covers/{{ song.cover_image }}" class="card-img-top" alt="{{ song.title }}-cover" style="height: 250px; object-fit: cover;">
                         </a>
 
                         <div class="card-body">
+
+                            <!-- Song Title and Artist -->
                             <h5 class="card-title text-truncate">{{ song.title }}</h5>
                             <p class="card-text text-muted small">{{ song.author }}</p>
 
+                            <!-- Rating Display -->
                             <div class="rating-box mt-2">
+                                <!-- Main Average Rating -->
                                 <div class="d-flex align-items-center mb-2">
                                     <span class="text-warning fs-5 me-1">★</span>
                                     <span class="fw-bold fs-5">{{ song.average_rating | default('-') }}</span>
                                     <span class="text-muted small ms-1">/ 10</span>
                                 </div>
 
+                                <!-- Individual Rating Averages (if rating exists) -->
                                 {% if song.average_rating %}
                                     <div class="small text-secondary d-flex justify-content-between">
                                         <span title="Kvalita">🎧 {{ song.average_quality }}</span>
@@ -53,17 +66,28 @@
                                         <span title="Text">📝 {{ song.average_lyrics }}</span>
                                     </div>
                                 {% endif %}
+
                             </div>
                         </div>
 
+                        <!-- Card Footer with Audio Player and Admin Delete -->
                         <div class="card-footer bg-white border-top-0">
+                            <!-- Audio Player -->
                             <audio controls class="w-100" src="/MusicHub/public/uploads/music/{{ song.filename }}"></audio>
+
+                            <!-- Admin Delete Functionality (visible only to admin) -->
+                            {% if user_role == 'admin' %}
+                                <form action="/MusicHub/public/index.php?page=admin_delete_music" method="POST" class="mt-2 text-end" onsubmit="return confirm('ADMIN: Opravdu smazat tuto skladbu a všechny její recenze?');">
+                                    <input type="hidden" name="song_id" value="{{ song.id_song }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">🗑️ Smazat (Admin)</button>
+                                </form>
+                            {% endif %}
                         </div>
 
                     </div>
                 </div>
             {% endfor %}
         </div>
-        </div>
+    </div>
     </div>
 {% endblock %}

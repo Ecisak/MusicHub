@@ -1,0 +1,90 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+    <div class="container mt-4 song-container">
+        <h3>Admin Board</h3>
+        <!-- Users Table -->
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Login</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Akce</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <th scope="row">{{ user.id_user }}</th>
+                    <td><strong>{{ user.username }}</strong></td>
+                    <td>{{ user.email }}</td>
+
+                    <!-- ROLE COLUMN: Role Change functionality -->
+                    <td>
+                        <!-- Logic: Prevent changing Superadmin or Admin (unless current user is Superadmin) -->
+                        {% if user.role == 'superadmin' %}
+                            <span class="badge bg-warning text-dark">Superadmin</span>
+
+                        {% elseif user.role == 'admin' and user_role != 'superadmin' %}
+                            <span class="badge bg-primary">Admin</span>
+
+                        {% else %}
+                            <!-- Form for changing user role -->
+                            <form action="/MusicHub/public/index.php?page=update_role" method="POST">
+                                <input type="hidden" name="user_id" value="{{ user.id_user }}">
+                                <select name="new_role" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    {% for roleName in availableRoles %}
+
+                                        <!-- PROTECTION: Which roles can be assigned? -->
+                                        <!-- If not Superadmin, cannot see or assign 'superadmin' or 'admin' -->
+                                        {% if (roleName == 'superadmin' or roleName == 'admin') and user_role != 'superadmin' %}
+                                            <!-- Hide this option -->
+                                        {% else %}
+                                            <option value="{{ roleName }}" {% if user.role == roleName %}selected{% endif %}>
+                                                {{ roleName }}
+                                            </option>
+                                        {% endif %}
+
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        {% endif %}
+                    </td>
+
+                    <!-- ACTION COLUMN: Ban/Unban functionality -->
+                    <td>
+                        <!-- Logic: Superadmin is untouchable. Admin is untouchable except by Superadmin. -->
+                        {% if user.role == 'superadmin' %}
+                            <span class="text-muted small">Nedotknutelný</span>
+
+                        {% elseif user.role == 'admin' and user_role != 'superadmin' %}
+                            <span class="text-muted small">Nedotknutelný</span>
+
+                        {% else %}
+                            <!-- Form for BAN/UNBAN -->
+                            <form action="/MusicHub/public/index.php?page=ban_user" method="POST">
+                                <input type="hidden" name="user_id" value="{{ user.id_user }}">
+
+                                {% if user.role == 'banned' %}
+                                    <input type="hidden" name="new_role" value="author">
+                                    <button type="submit" class="btn btn-sm btn-success w-100">
+                                        UNBAN
+                                    </button>
+                                {% else %}
+                                    <input type="hidden" name="new_role" value="banned">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100" onclick="return confirm('Opravdu zabanovat tohoto uživatele?')">
+                                        BAN
+                                    </button>
+                                {% endif %}
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

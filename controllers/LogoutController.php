@@ -8,14 +8,18 @@
 class LogoutController
 {
     /**
-     * Log out the user and destroy session
+     * Log out the user and destroy session.
+     * @return void
      */
     public function logout(): void
     {
-        // Clear all session variables
+        // 1. Preserve user ID (optional, but harmless)
+        $userId = $_SESSION['user_id'] ?? null;
+
+        // 2. Clear all session variables
         $_SESSION = [];
 
-        // Delete session cookie if cookies are enabled
+        // 3. Clear the session cookie (the most critical step for proper logout)
         if (ini_get("session.use_cookies")) {
             $params = session_get_cookie_params();
             setcookie(
@@ -29,11 +33,11 @@ class LogoutController
             );
         }
 
-        // Destroy the session
+        // 4. Destroy the session data on the server
         session_destroy();
 
-        // Redirect to login page
-        header("Location: /MusicHub/public/index.php?page=login");
+        // 5. Redirect to login page with a status parameter
+        header("Location: /MusicHub/public/index.php?page=login&status=loggedout");
         exit;
     }
 }

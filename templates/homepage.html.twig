@@ -1,5 +1,67 @@
-{% extends "layout.html.twig" %}
+{% extends 'layout.html.twig' %}
 
 {% block content %}
+    <div class="container mt-5">
 
+        <!-- Hero Section -->
+        <!-- Styling: Uses a vibrant gradient background and a subtle shadow for depth. -->
+        <div class="p-5 mb-5 rounded-4 text-center position-relative overflow-hidden"
+             style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);">
+
+            <div class="container-fluid py-4 position-relative" style="z-index: 2;">
+                <!-- Hero Heading -->
+                <h1 class="display-4 fw-bold text-white mb-3">Vítejte na MusicHub</h1>
+                <!-- Hero Subtext -->
+                <p class="fs-5 text-white opacity-75 mb-4 col-md-8 mx-auto">
+                    Webová aplikace pro správu, hodnocení a sdílení hudebních skladeb.
+                    Projekt demonstruje implementaci MVC architektury, práci s databází a uživatelskými rolemi.
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-center gap-3">
+                    {% if isLoggedIn %}
+                        <!-- Button 1: Primary action for logged-in users (Explore) -->
+                        <a href="/MusicHub/public/index.php?page=explore" class="btn btn-light btn-lg px-4 fw-bold">
+                            Prohlížet databázi
+                        </a>
+                        <!-- Button 2: Secondary action for logged-in users (Upload) -->
+                        <a href="/MusicHub/public/index.php?page=add" class="btn btn-outline-light btn-lg px-4">
+                            Nahrát skladbu
+                        </a>
+                    {% else %}
+                        <!-- Button 1: Primary action for guests (Login) -->
+                        <a href="/MusicHub/public/index.php?page=login" class="btn btn-light btn-lg px-4 fw-bold">
+                            Přihlásit se
+                        </a>
+                        <!-- Button 2: Secondary action for guests (Explore without login) -->
+                        <a href="/MusicHub/public/index.php?page=explore" class="btn btn-outline-light btn-lg px-4">
+                            Pokračovat bez přihlášení
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Information Section (Two Columns) -->
+        <div class="row g-5">
+            <div class="col-md-6">
+                <!-- About Project Heading -->
+                <h3 class="text-white border-bottom pb-2 border-secondary">O projektu</h3>
+                <p class="text-secondary mt-3">
+                    Aplikace umožňuje uživatelům nahrávat MP3 soubory, které následně prochází procesem validace.
+                    Schválené skladby jsou hodnoceny recenzenty a řazeny v reálném čase.
+                </p>
+            </div>
+            <div class="col-md-6">
+                <!-- Technology Stack Heading -->
+                <h3 class="text-white border-bottom pb-2 border-secondary">Technologie</h3>
+                <p class="text-secondary mt-3">
+                    PHP 8, MySQL, Twig, Bootstrap 5. <br>
+                    Využívá Composer pro správu závislostí. Celý projekt je uploadnutý na GitHubu.
+                </p>
+            </div>
+        </div>
+
+    </div>
 {% endblock %}

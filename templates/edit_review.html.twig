@@ -1,0 +1,70 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Upravit recenzi{% endblock %}
+{% block content %}
+    <div class="container mt-4 song-container">
+        <div class="card mt-4 song-card">
+            <div class="card-title review-title">
+                Editovat recenzi
+            </div>
+            <div class="card-body">
+                <form action="/MusicHub/public/index.php?page=process_edit_review" method="POST">
+                    <!-- Hidden input for review ID -->
+                    <input type="hidden" name="review_id" value="{{ review.id_review }}">
+
+                    <!-- Hidden input for song ID (if needed for redirect/context) -->
+                    <input type="hidden" name="song_id" value="{{ review.id_song }}">
+
+
+                    <div class="row">
+                        <!-- Quality Rating Input -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label review-text-np">Kvalita (1-10)</label>
+                            <input type="number" name="rating_quality" class="form-control" min="1" max="10" value="{{ review.rating_quality }}" required>
+                        </div>
+                        <!-- Originality Rating Input -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label review-text-np">Originalita (1-10)</label>
+                            <input type="number" name="rating_originality" class="form-control" min="1" max="10" value="{{ review.rating_originality }}" required>
+                        </div>
+                        <!-- Lyrics Rating Input -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label review-text-np">Text (1-10)</label>
+                            <input type="number" name="rating_lyrics" class="form-control" min="1" max="10" value="{{ review.rating_lyrics }}" required>
+                        </div>
+                    </div>
+
+                    <!-- Comment/Textual Review Input (CKEditor) -->
+                    <div class="mb-3">
+                        <label class="form-label review-text-np">Slovní hodnocení</label>
+                        <textarea name="comment" id="editor" class="form-control" rows="3">
+                        {{ review.comment | raw }}
+                </textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-success">Aktualizovat recenzi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- CKEditor 5 Script Inclusion -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
+    <script>
+        // CKEditor initialization script
+        ClassicEditor
+            .create( document.querySelector( '#editor' ), {
+                // Configure the toolbar options
+                toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
+                placeholder: 'Napište své slovní hodnocení...'
+            } )
+            .catch( error => {
+                console.error( error );
+            } );
+    </script>
+    <!-- Custom style to set minimum height for CKEditor -->
+    <style>
+        .ck-editor__editable_inline {
+            min-height: 200px;
+        }
+    </style>
+{% endblock %}

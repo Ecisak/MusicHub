@@ -1,0 +1,67 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}O nás{% endblock %}
+{% block content %}
+
+    <div class="container mt-5" style="max-width: 900px;">
+
+        <!-- Header Section -->
+        <div class="mb-5 pb-3 border-bottom border-secondary">
+            <h1 class="text-white">O aplikaci</h1>
+            <p class="lead text-secondary">Semestrální projekt KIV/WEB s implementací MVC architektury.</p>
+        </div>
+
+        <!-- Application Workflow Section -->
+        <div class="mb-5">
+            <h3 class="mb-4 text-white">Workflow aplikace</h3>
+
+            <div class="list-group shadow-lg">
+                <!-- Workflow Step 1: Upload -->
+                <div class="list-group-item p-4 bg-dark text-white border-bottom border-secondary">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 fw-bold text-info">1. Upload (Autor)</h5>
+                    </div>
+                    <p class="mb-1 text-light opacity-75">Registrovaný uživatel nahraje skladbu. Ta získává status <code>pending</code> a není veřejně viditelná.</p>
+                </div>
+
+                <!-- Workflow Step 2: Validation -->
+                <div class="list-group-item p-4 bg-dark text-white border-bottom border-secondary">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 fw-bold text-info">2. Validace (Recenzent)</h5>
+                    </div>
+                    <p class="mb-1 text-light opacity-75">Recenzent zkontroluje technickou stránku souboru a posune skladbu na status <code>accepted</code> nebo ji zamítne.</p>
+                </div>
+
+                <!-- Workflow Step 3: Review -->
+                <div class="list-group-item p-4 bg-dark text-white border-bottom border-secondary">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 fw-bold text-info">3. Recenze (Recenzent)</h5>
+                    </div>
+                    <p class="mb-1 text-light opacity-75">Schválené skladby mohou recenzenti hodnotit bodově i slovně (WYSIWYG editor). Recenze podléhají schválení administrátorem.</p>
+                </div>
+
+                <!-- Workflow Step 4: Publication & API -->
+                <div class="list-group-item p-4 bg-dark text-white">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 fw-bold text-info">4. Publikace & API</h5>
+                    </div>
+                    <p class="mb-1 text-light opacity-75">Data jsou agregována a zobrazena v reálném čase (SSE API) na stránce s žebříčkem.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack Section -->
+        <div class="row mt-5 pt-4 border-top border-secondary">
+            <div class="col-12">
+                <h4 class="mb-3 text-white">Tech Stack</h4>
+                <span class="badge bg-primary fs-6 me-2">PHP 8.x (MVC)</span>
+                <span class="badge bg-primary fs-6 me-2">MySQL / MariaDB</span>
+                <span class="badge bg-primary fs-6 me-2">Twig Templating</span>
+                <span class="badge bg-primary fs-6 me-2">Bootstrap 5</span>
+                <span class="badge bg-secondary fs-6 me-2">SSE / REST API</span>
+                <span class="badge bg-secondary fs-6 me-2">HTML Purifier (Sanitizace XSS)</span>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

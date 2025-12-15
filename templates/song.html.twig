@@ -1,60 +1,71 @@
 {% extends 'layout.html.twig' %}
-
+{% block title %}Detaily Písničky {{ song.title }}{% endblock %}
 
 
 {% block content %}
-<div class="container mt-4 song-container">
-    <div class="card mb-3 song-card">
-        <img src="/MusicHub/public/uploads/covers/{{ song.cover_image }}" class="card-img song-img" alt="{{ song.title }} cover image">
-        <audio controls class="song-control" src="/MusicHub/public/uploads/music/{{ song.filename }}"></audio>
-        <div class="card-body">
-            <h1 class="card-title song-title">{{ song.title }}</h1>
-            <p class="card-text song-text song-author">{{ song.author }}</p>
-            <div class="song">
-                <p class="card-text song-text song">{{ genre.genre }} - {{ song.release_year }}</p>
-            </div>
-            <div class="row">
-                <div class="col-md-4 text-center border-end d-flex flex-column justify-content-center">
-                    <h2 class="display-4 fw-bold text-warning">
-                        ★ {{ song.average_rating | default('0') }}
-                    </h2>
-                    <p class="song-text">Celkové hodnocení</p>
+    <div class="container mt-4 song-container">
+        <!-- Song Details Card -->
+        <div class="card mb-3 song-card">
+            <!-- Cover Image -->
+            <img src="/MusicHub/public/uploads/covers/{{ song.cover_image }}" class="card-img song-img" alt="{{ song.title }} cover image">
+            <!-- Audio Player -->
+            <audio controls class="song-control" src="/MusicHub/public/uploads/music/{{ song.filename }}"></audio>
+            <div class="card-body">
+                <!-- Title and Artist -->
+                <h1 class="card-title song-title">{{ song.title }}</h1>
+                <p class="card-text song-text song-author">{{ song.author }}</p>
+                <!-- Genre and Year -->
+                <div class="song">
+                    <p class="card-text song-text song">{{ genre.genre }} - {{ song.release_year }}</p>
                 </div>
-
-                <div class="col-md-8">
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between">
-                            <span class="song-text">🎧 Kvalita zvuku</span>
-                            <span class="song-text">{{ song.average_quality | default('0') }}/10</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ song.average_quality * 10 }}%"></div>
-                        </div>
+                <div class="row">
+                    <!-- Overall Rating Display -->
+                    <div class="col-md-4 text-center border-end d-flex flex-column justify-content-center">
+                        <h2 class="display-4 fw-bold text-warning">
+                            ★ {{ song.average_rating | default('0') }}
+                        </h2>
+                        <p class="song-text">Celkové hodnocení</p>
                     </div>
 
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between">
-                            <span class="song-text">💡 Originalita</span>
-                            <span class="song-text">{{ song.average_originality | default('0') }}/10</span>
+                    <!-- Individual Rating Progress Bars -->
+                    <div class="col-md-8">
+                        <!-- Quality Rating -->
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span class="song-text">🎧 Kvalita zvuku</span>
+                                <span class="song-text">{{ song.average_quality | default('0') }}/10</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ song.average_quality * 10 }}%"></div>
+                            </div>
                         </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ song.average_originality * 10 }}%"></div>
-                        </div>
-                    </div>
 
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between">
-                            <span class="song-text">📝 Text</span>
-                            <span class="song-text">{{ song.average_lyrics | default('0') }}/10</span>
+                        <!-- Originality Rating -->
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span class="song-text">💡 Originalita</span>
+                                <span class="song-text">{{ song.average_originality | default('0') }}/10</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ song.average_originality * 10 }}%"></div>
+                            </div>
                         </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ song.average_lyrics * 10 }}%"></div>
+
+                        <!-- Lyrics Rating -->
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span class="song-text">📝 Text</span>
+                                <span class="song-text">{{ song.average_lyrics | default('0') }}/10</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ song.average_lyrics * 10 }}%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
+        <!-- Review Form (Visible if user is reviewer, not the song owner, and hasn't reviewed yet) -->
         {% if user_role == 'reviewer' and current_user_id != song.id_user and not hasReviewed %}
             <div class="card mt-4 song-card">
                 <div class="card-title review-title">
@@ -65,20 +76,24 @@
                         <input type="hidden" name="song_id" value="{{ song.id_song }}">
 
                         <div class="row">
+                            <!-- Quality Rating Input -->
                             <div class="col-md-4 mb-3">
                                 <label class="form-label review-text-np">Kvalita (1-10)</label>
                                 <input type="number" name="rating_quality" class="form-control" min="1" max="10" required>
                             </div>
+                            <!-- Originality Rating Input -->
                             <div class="col-md-4 mb-3">
                                 <label class="form-label review-text-np">Originalita (1-10)</label>
                                 <input type="number" name="rating_originality" class="form-control" min="1" max="10" required>
                             </div>
+                            <!-- Lyrics Rating Input -->
                             <div class="col-md-4 mb-3">
                                 <label class="form-label review-text-np">Text (1-10)</label>
                                 <input type="number" name="rating_lyrics" class="form-control" min="1" max="10" required>
                             </div>
                         </div>
 
+                        <!-- Comment/Textual Review Input (CKEditor) -->
                         <div class="mb-3">
                             <label class="form-label review-text-np">Slovní hodnocení</label>
                             <textarea name="comment" id="editor" class="form-control" rows="3"></textarea>
@@ -87,32 +102,38 @@
                         <button type="submit" class="btn btn-success">Odeslat recenzi</button>
                     </form>
                 </div>
-
+            </div>
         {% elseif hasReviewed %}
+            <!-- Message if the user has already reviewed the song -->
             <div class="alert alert-success mt-4"> Tuto skladbu už jsi ohodnotil. Díky za tvojí práci!</div>
         {% endif %}
+
+        <!-- Reviews Section -->
         <div class="card-footer border-top-0 song-footer">
             <h1 class="card-header song-title">Recenze</h1>
             {% if reviews is empty %}
             <p class="card-text review-text">Zatím žádné recenze.</p>
             {% else %}
             {% for review in reviews %}
-                <div>
-                    <div class="card mb-3 review-card">
-                        <div class="card-body">
-                            <h6 class="card-subtitle song-artist">{{ review.created_at | date("d. m. Y") }}</h6>
-                            <h5 class="card-title review-author">Recenzent: {{ review.username }}</h5>
-                            <div class="mb-2">
-                                <span class="badge bg-primary">Kvalita: {{ review.rating_quality }}/10</span>
-                                <span class="badge bg-info">Originalita: {{  review.rating_originality }}/10</span>
-                                <span class="badge bg-success">Text: {{ review.rating_lyrics }}/10</span>
-                            </div>
-                            <p class="card-text review-text"> {{ review.comment | raw }}</p>
+            <div>
+                <!-- Individual Review Card -->
+                <div class="card mb-3 review-card">
+                    <div class="card-body">
+                        <h6 class="card-subtitle song-artist">{{ review.created_at | date("d. m. Y") }}</h6>
+                        <h5 class="card-title review-author">Recenzent: {{ review.username }}</h5>
+                        <!-- Individual Rating Badges -->
+                        <div class="mb-2">
+                            <span class="badge bg-primary">Kvalita: {{ review.rating_quality }}/10</span>
+                            <span class="badge bg-info">Originalita: {{  review.rating_originality }}/10</span>
+                            <span class="badge bg-success">Text: {{ review.rating_lyrics }}/10</span>
                         </div>
+                        <!-- Review Comment -->
+                        <p class="card-text review-text"> {{ review.comment | raw }}</p>
                     </div>
-                    {% endfor %}
-                    {% endif %}
                 </div>
+                {% endfor %}
+                {% endif %}
+            </div>
         </div>
 
 
@@ -120,11 +141,14 @@
 
     </div>
     </div>
-</div>
+    </div>
+    <!-- CKEditor 5 Script Inclusion -->
     <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
     <script>
+        // CKEditor initialization script
         ClassicEditor
             .create( document.querySelector( '#editor' ), {
+                // Configure the toolbar options
                 toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
                 placeholder: 'Napište své slovní hodnocení...'
             } )
@@ -132,6 +156,7 @@
                 console.error( error );
             } );
     </script>
+    <!-- Custom style to set minimum height for CKEditor -->
     <style>
         .ck-editor__editable_inline {
             min-height: 200px;

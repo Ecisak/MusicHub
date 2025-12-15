@@ -1,7 +1,7 @@
 <?php
 /**
  * User Model
- * Handles database operations for users
+ * Handles database operations for users: authentication, registration, and administrative tasks.
  */
 
 class User
@@ -9,7 +9,8 @@ class User
     private PDO $db;
 
     /**
-     * Constructor - Initialize database connection
+     * Constructor - Initialize database connection.
+     * @param PDO $db The PDO database connection instance.
      */
     public function __construct(PDO $db)
     {
@@ -17,7 +18,9 @@ class User
     }
 
     /**
-     * Check if user with given email exists
+     * Check if a user with the given email exists.
+     * @param string $email The email address to check.
+     * @return bool True if the email exists, false otherwise.
      */
     public function exists(string $email): bool
     {
@@ -27,7 +30,9 @@ class User
     }
 
     /**
-     * Check if username is already taken (case-insensitive)
+     * Check if a username is already taken (case-insensitive check is recommended but implementation here is case-sensitive).
+     * @param string $username The username to check.
+     * @return bool True if the username exists, false otherwise.
      */
     public function usernameExists(string $username): bool
     {
@@ -37,7 +42,11 @@ class User
     }
 
     /**
-     * Create a new user in the database
+     * Create a new user in the database with role 'author' (default role).
+     * @param string $username The user's desired username.
+     * @param string $email The user's email address.
+     * @param string $password The user's plain text password.
+     * @return void
      */
     public function create(string $username, string $email, string $password): void
     {
@@ -46,8 +55,8 @@ class User
 
         // Insert new user record
         $stmt = $this->db->prepare(
-            "INSERT INTO users (username, email, password_hash, created_at) VALUES (:u, :e, :p, NOW())"
-        );
+            "INSERT INTO users (username, email, password_hash, created_at, role) VALUES (:u, :e, :p, NOW(), 'author')"
+        ); // Added 'author' as the default role
         $stmt->execute([
             'u' => $username,
             'e' => $email,
@@ -56,9 +65,9 @@ class User
     }
 
     /**
-     * Find user by email address
-     *
-     * @return array|null User data or null if not found
+     * Find user by email address.
+     * @param string $email The email address.
+     * @return array|null User data or null if not found.
      */
     public function findByEmail(string $email): ?array
     {
@@ -66,5 +75,37 @@ class User
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         return $user ?: null;
+    }
+
+    /**
+     * Retrieves all users from the database.
+     * @return array An array of all user records.
+     */
+    public function getAllUsers(): array {
+        $stmt = $this->db->prepare("SELECT * FROM users");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Retrieves a single user by their ID.
+     * @param int $id The ID of the user.
+     * @return array|false The user record or false if not found.
+     */
+    public function getById(int $id): array|false {
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE id_user = :id");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Updates the role of a specified user.
+     * @param int $userId The ID of the user to update.
+     * @param string $newRole The new role to assign.
+     * @return bool True on success, false on failure.
+     */
+    public function updateRole(int $userId, string $newRole): bool {
+        $stmt = $this->db->prepare("UPDATE users SET role = :role WHERE id_user = :id");
+        return $stmt->execute(['role' => $newRole, 'id' => $userId]);
     }
 }

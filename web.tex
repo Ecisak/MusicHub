@@ -1,0 +1,88 @@
+\documentclass[12pt, a4paper]{report}
+% \prikaz
+\usepackage[utf8]{inputenc}
+\usepackage[IL2]{fontenc}
+\usepackage[czech]{babel}
+\usepackage[
+    left=30mm,
+    right=30mm,
+    top=40mm,
+    bottom=30mm
+]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings} % na zdrojak
+
+\begin{document}
+\begin{titlepage}
+    \centering % Všechno vycentrovat
+
+    % Hlavička univerzity
+    {\Large Západočeská univerzita v Plzni \\}
+    {\Large Fakulta aplikovaných věd \\}
+    \vspace{2cm} % Mezera
+
+    % Název práce
+    {\Huge \textbf{Semestrální práce KIV/WEB} \\}
+    \vspace{0.5cm}
+    {\Large Téma: MusicHub \\}
+
+    \vfill % Pružná mezera - odtlačí text dolů
+
+    % Autor a datum
+    {\Large \textbf{Lukáš Vácha} \\}
+    \vspace{0.5cm} % Mezera mezi jménem a emailem
+    {\large \texttt{lukvach@students.zcu.cz} \\}
+    \vspace{1cm}
+    {\Large \today} % Dnešní datum
+
+\end{titlepage}
+
+
+\tableofcontents
+
+% Přidal jsem ukázkovou kapitolu, aby se v obsahu něco zobrazilo
+\chapter{Alternativní Zadání}
+\section{Stručný popis}
+Cílem projektu bylo vytvořit stránku MusicHub. 
+Na této stránce mohou lidé sdílet hudbu a jejich názory.
+Převzal jsem zadání konference a změnil jsem nahrávaný materiál. 
+Místo článků autoři nahrávají zvukovou stopu a cover alba.
+
+\section{Role}
+\begin{itemize}
+\item{návštěvník (nepřihlášený uživatel)}
+\begin{itemize}
+\item{může prohlížet nahrané písničky a číst recenze}
+\item{má možnost registrace}
+\item{má možnost vidět žebříček nejlépe hodnocených písniček}
+\end{itemize}
+\item{Autor (registrovaný uživatel)}
+\begin{itemize}
+\item{má možnost nahrávat zvukové stopy + cover alba}
+\item{vidí stav nahrané písničky (zamítnuta/čeká na schválení/akceptována)}
+\end{itemize}
+\item{Recenzent}
+\begin{itemize}
+\item{schvaluje písničky (kontroluje správnost dat)}
+\item{Může psát recenze na všechny písničky kromě svých}
+\item{Může vidět stav nahrané recenze (zamitnuta/čeká na schválení/akceptována)}
+\item{Může editovat recenzi, pokud ještě nebyla akceptována či zamítnuta}
+\end{itemize}
+\item{Admin}
+\begin{itemize}
+\item{Má možnost schvalovat recenze}
+\item{Má možnost banovat uživatele}
+\item{Má možnost dávat role uživatelům a nemůže ovlivňovat ostatní adminy}
+\end{itemize}
+\item{Superadmin}
+\begin{itemize}
+\item{Má veškeré pravomoce jako admin}
+\item{Může dávat role admin a superadmin}
+\end{itemize}
+\end{itemize}
+\section{Model Databáze}
+\includegraphics{/home/ecis/Downloads/musichub.pdf}
+
+
+\end{document}

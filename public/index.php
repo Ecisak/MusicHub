@@ -155,7 +155,7 @@ switch ($page) {
         break;
 
     case 'process_validation':
-        // Process song approval/rejection (POST request only, restricted to reviewer role)
+        // Process song approval/rejection (POST request only, restricted to reviewer)
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_SESSION['role']) || $_SESSION['role'] !== 'reviewer') {
             header('Location: /MusicHub/public/index.php?page=home');
             exit;

@@ -70,7 +70,7 @@
                     <li class="nav-item my-nav"><a class="nav-link {% if current_page == 'explore' %}active{% endif %}" href="/MusicHub/public/index.php?page=explore">Prohlížet Hudbu</a></li>
 
                     <!-- Validation link (visible only to Reviewer/Admin with pending songs) -->
-                    {% if (user_role == 'reviewer' or user_role == 'admin' or user_role =='superadmin') and pending_songs_count > 0 %}
+                    {% if (user_role == 'reviewer') and pending_songs_count > 0 %}
                         <li class="nav-item my-nav">
                             <a class="nav-link" href="/MusicHub/public/index.php?page=review">
                                 Validace

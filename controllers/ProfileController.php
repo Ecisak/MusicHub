@@ -26,7 +26,7 @@ Class ProfileController {
      * @return void
      */
     public function showProfile($twig): void {
-        // Ensure user is logged in (checked by the front controller, but good practice here too)
+        // Ensure user is logged in (checked by the front controller already, but just in case)
         if (!isset($_SESSION['user_id'])) {
             header('Location: /MusicHub/public/index.php?page=login');
             exit;

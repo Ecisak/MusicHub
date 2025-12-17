@@ -4,6 +4,10 @@
  * Handles database operations for users: authentication, registration, and administrative tasks.
  */
 
+/**
+ *
+ */
+
 class User
 {
     private PDO $db;

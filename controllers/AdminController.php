@@ -71,7 +71,7 @@ class AdminController {
     public function showUsers($twig): void {
         $role = $_SESSION['role'] ?? '';
         // Role check: Admin and Superadmin access
-        if ($role !== 'admin' && $role !== 'superadmin') { // Corrected logic to check both admin and superadmin
+        if ($role !== 'admin' && $role !== 'superadmin') {
             $_SESSION['flash'] = [
                 'message' => 'na tuto stránku nemáte přístup',
                 'type' => 'danger'

@@ -1,6 +1,7 @@
-\documentclass[12pt, a4paper]{report}
+\documentclass[12pt, a4paper]{article}
 % \prikaz
 \usepackage[utf8]{inputenc}
+\usepackage{tabularx}
 \usepackage[IL2]{fontenc}
 \usepackage[czech]{babel}
 \usepackage[
@@ -15,41 +16,39 @@
 
 \begin{document}
 \begin{titlepage}
-    \centering % Všechno vycentrovat
+    \centering 
 
-    % Hlavička univerzity
+    
     {\Large Západočeská univerzita v Plzni \\}
     {\Large Fakulta aplikovaných věd \\}
-    \vspace{2cm} % Mezera
-
-    % Název práce
+    \vspace{2cm}
+    
     {\Huge \textbf{Semestrální práce KIV/WEB} \\}
     \vspace{0.5cm}
     {\Large Téma: MusicHub \\}
 
-    \vfill % Pružná mezera - odtlačí text dolů
+    \vfill 
 
-    % Autor a datum
+
     {\Large \textbf{Lukáš Vácha} \\}
-    \vspace{0.5cm} % Mezera mezi jménem a emailem
+    \vspace{0.5cm} 
     {\large \texttt{lukvach@students.zcu.cz} \\}
     \vspace{1cm}
-    {\Large \today} % Dnešní datum
+    {\Large \today} 
 
 \end{titlepage}
 
 
 \tableofcontents
-
-% Přidal jsem ukázkovou kapitolu, aby se v obsahu něco zobrazilo
-\chapter{Alternativní Zadání}
-\section{Stručný popis}
+\newpage
+\section{Alternativní Zadání}
+\subsection{Stručný popis}
 Cílem projektu bylo vytvořit stránku MusicHub. 
 Na této stránce mohou lidé sdílet hudbu a jejich názory.
 Převzal jsem zadání konference a změnil jsem nahrávaný materiál. 
 Místo článků autoři nahrávají zvukovou stopu a cover alba.
 
-\section{Role}
+\subsection{Role} \label{role}
 \begin{itemize}
 \item{návštěvník (nepřihlášený uživatel)}
 \begin{itemize}
@@ -81,8 +80,151 @@ Místo článků autoři nahrávají zvukovou stopu a cover alba.
 \item{Může dávat role admin a superadmin}
 \end{itemize}
 \end{itemize}
-\section{Model Databáze}
-\includegraphics{/home/ecis/Downloads/musichub.pdf}
+\subsection{Model Databáze}
+\includegraphics[scale=0.4]{/home/ecis/Downloads/musichub.png}
+\section{Realizace}
+\subsection{Architektura}
+Projekt je realizován architekturou \textbf{MVC} (Model View Controller).
+Modely jsou rozdělené podle tabulek. Např. metoda získavající uživatele je v souboru \verb|user.php|.
+Modely obsahují dotazy či databázi upravují (mazáním či updatem). 
+Modely jsou složeny z PHP metod, kde jsou pomocí SQL pokládany dotazy na databázi.
+Tyto data jsou předány dál \textbf{kontrolerům} a ty je předávají pohledům. 
+Kontrolery jsou plně napsány v PHP.
+\textbf{Pohledy} obsahují HTML a jsou vlastně prezentérem celé stránky. Zobrazují předaná data.
+Pohledy využívají HTML a CSS (převážně používán framework Bootstrap), u některých stránek je použitt JavaScript.
+
+\newpage
+\subsection{Uživatelé}
+Veškeré role mám již zmíněné v \ref{role}. 
+Jediným dalším vylepšením je, že pokud se uživatel pokusí dostat na stránku, ke které nemá přístup.
+Tak jej to vyhodí buď na \verb|login| page (nepřihlášený), nebo na \verb|home| (přihlášený).
+V prvním případě mu přes \verb|toast| notifikaci přijde, že není přihlášený, resp. nemá práva na přístup k této stránce.
+\vspace{2mm}
+\begin{center}
+\begin{tabularx}{1\textwidth} { 
+  | >{\centering\arraybackslash}X 
+  | >{\centering\arraybackslash}X 
+  | >{\centering\arraybackslash}X | }
+ \hline
+ E-mail & Heslo & Role \\
+\hline
+super@super.c & Superadmin1 & superadmin \\
+\hline
+admin@kobliha.cz & Kobliha1 & admin \\
+\hline
+admin@sunka.cz & Suncicka1 & admin \\
+\hline
+reviewer@pako.cz & Reviewer1 & reviewer \\
+\hline
+reviewer@trdlo.cz & Reviewer2 & reviewer \\
+\hline
+User1@User1.User1  & UserUser1  & author  \\
+ \hline
+
+\end{tabularx}
+\end{center}
+
+\subsection{Struktura}
+Struktura se skládá z následujících významných souborů a všech složek:
+\begin{itemize}
+\item \verb|public/| - veřejná složka, která je přístupná z webu, obsahuje css, logo, favicon a \verb|index.php|
+\begin{itemize}
+\item \verb|index.php| - Přední Kontroler, hlavní router.
+\item \verb|uploads| - Uživatelská data, veškeré nahrané obrázky a audio soubory.
+\end{itemize}
+\item \verb|controllers/| - Třídy pro zpracování požadavků.
+\begin{itemize}
+\item \verb|ApiController.php| - API pro \verb|JSON| data. Generuje data pro Leaderboard (\verb|SSE|) \verb|REST API GETTER|.
+\end{itemize}
+\item \verb|models/| - Třídy a metody pro komunikaci s databází.
+\item \verb|templates/| - Veškerý vzhled projektu. Využity \verb|twig| šablony.
+\item \verb|vendor/| - Externí knihovny, ovládány \verb|Composerem|.
+\item \verb|logs/| - Velmi základní logging chyb.
+\end{itemize}
+
+\subsection{Knihovny}
+Knihovny jsou zpravovány \verb|twig| Composerem.
+
+\subsubsection{Bootstrap 5}
+Framework, který tvoří skoro celý vzhled webu. Je využit pro alerty, tabulky, navbar a mnohem více.
+Na pár stránkách je využit i JavaScript. Zajišťuje responzivitu webu.
+
+\subsubsection{AJAX}
+Využit na stránce registrace, je užit pro real-time kontrolu dostupnosti emailu či jména. Je využit i \verb|debouncing|.
+\subsubsection{PDO}
+Všechny databázové dotazy v Modelech používají \verb|prepare()| a \verb|execute()| s placeholdery. 
+Tím je garantována ochrana proti \verb|SQL Injection|.
 
 
+\subsubsection{Twig}
+Šablonovací systém. V projektu je využíván pro veškeré HTML. Data z modelů jsou do něj doplňovány za pomocí \verb|for a if| logiky.
+Je také zodpovědný za kontextové escapování, což garantuje \verb|XSS| ochranu.
+
+
+\subsubsection{CKEditor 5}
+WYSIWYG Editor. Byl použit pro lepší formátování textu u recenzí.
+
+\subsubsection{HTML Purifier}
+Využit pro sanitizaci HTML z důvodu \verb|XSS| ochrany. Zpracovává veškerý text z CKEditoru.
+Odstraňuje nebezpečné značky a zajišťuje, že se do databáze dostane pouze bezpečné HTML.
+
+\section{Funkcionality}
+\subsection{Autentizace a Autorizace}
+\subsubsection{Registrace a přihlášení}
+Registrace probíhá s unikátní kontrolou dostupnosti emailu a jména přes \verb|AJAX|.
+Hesla jsou hashována algoritmem \verb|bcrypt|. Po přihlášení je v \verb|session| uložena role.
+Veškeré formuláře obsahují \textbf{CSRF} ochranu. Funkce banování se provádí přes udělení role v databázi.
+Při přihlášení se role kontroluje. V případě banu aplikace zabrání uživateli se přihlásit.
+Odhlášení ničí session a maže cookies.
+
+\subsubsection{Zabezpečení stránek}
+Všechny citlivé stránky na práva kontrolují oprávnění v routeru.
+Nepřihlášený či neautorizovaný uživatel je přesměrován s informativní Toast zprávou.
+
+\subsection{Autorská správa hudby}
+\subsubsection{Nahrávání Hudby}
+Zaregistrovaný uživatel nahrává audio soubor a obal alba. 
+Probíhá validace souborů. Kontrolují se koncovky, typy a velikosti souborů.
+Při selhání validace či serveru jsou chyby zobrazeny u konkrétních polí.
+Data z formuláře jsou zachována.
+Veškerým souborům jsou přiřazeny unikátní názvy, což zabraňuje kolizím.
+
+\subsubsection{Správa v profilu}
+Autor vidí všechny své nahrané skladby, které jsou seřazeny dle data nahrání sestupně.
+U každé skladby je zobrazen aktuální status.
+
+\subsection{Systém schvalování a recenzí}
+Pro zajištění vysoké kvality hudby a recenzí je zavedena dvoufázová kontrola a detailní bodování.
+\subsubsection{Technická validace}
+Recenzent je automaticky přiřazen k jedné čekající skladbě přes transakci. Toto přiřazení je unikátní, tudíž jí žádný jiný recenzent nemůže schválit.
+Samozřejmě v případě, že je recenzent neaktivní je pevně daný time out.
+Dále recenzent ohodnotí validitu skladby. Pokud je v pořádku, schválí jí a je viditelná pro všechny uživatele.
+
+\subsubsection{Slovní a bodové hodnocení}
+Formulář recenze se nezobrazuje recenzentům, kteří skladbu již ohodnotili a nebo recenzentům, kteří danou písničku nahráli, kvůli biasu.
+Hodnocení je zadáno bodově pro originalitu, kvalitu a text. Pro formátování je použit CKEditor, vstup je sanitizován kvůli XSS před uložením do Databáze.
+Recenze je následně odeslána ke schválení administrátorovi. Dokud není skladba přijata, editor může upravovat své hodnocení či jej smazat.
+
+\subsection{Správa uživatelů a administrace}
+\subsubsection{Správa uživatelů}
+Stránka je dostupná pouze adminům a superadminům.
+Tabulka je seřazena dle role a poté dle uživatelského jména.
+Správa využívá hierarchickou ochranu, admini smí spravovat uživatele s nižší rolí.
+Admini mají zakázáno měnit role u jiného admina, superadmina nebo povyšovat uživatele na admina či superadmina.
+Oprávnění je vizuálně skryto i blokováno kontrolerem.
+Administátoři mohou spravovat role, banovat a unbanovat uživatele.
+
+\subsubsection{Administrace}
+Admin má přehled čekajících recenzí se všemi kritérii a možností schválit či zamítnout.
+Admin má také možnost nenávratně smazat jakoukoliv skladbu z databáze, včetně souborů na disku.
+
+\subsection{Veřejné sekce}
+\subsubsection{Stránka Explore}
+Zobrazuje všechny schválené skladby. Zde si lidé mohou poslechnout nahrané skladby a recenzenti je zde mají možnost hodnotit.
+U každé karty je zobrazen celkový průměr a dílčí skóre pro originalitu, kvalitu a text.
+Je možnost dynamického řazení podle všech 4 kritérií a podle 2 směrů.
+
+\subsubsection{Žebříček}
+Tabulka top 10 nejlépe hodnocených skladeb je autoamticky aktualizována pomocí \verb|Server-Sent Events|, které navazují trvalé spojení s API.
+Javascript komunikuje s PHP controllerem, který periodicky generuje JSON data z databáze.
 \end{document}
